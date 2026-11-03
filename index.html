@@ -50,7 +50,7 @@
         );
     }
 
-    /* Area verticale 9:16 */
+    /* Area verticale in formato 9:16 */
     .avatar-frame {
       position: relative;
       width: min(100vw, calc(100dvh * 9 / 16));
@@ -62,7 +62,7 @@
       isolation: isolate;
     }
 
-    /* Anteprima e video dell'avatar */
+    /* Anteprima e video LiveAvatar */
     .avatar-preview,
     .avatar-video {
       position: absolute;
@@ -105,7 +105,7 @@
       pointer-events: none;
     }
 
-    /* Pulsante centrato geometricamente */
+    /* Pulsante perfettamente centrato */
     .start-button {
       position: absolute;
       top: 50%;
@@ -174,7 +174,7 @@
       opacity: 0.86;
     }
 
-    /* Prima riga: icona e Avvia */
+    /* Prima riga: microfono e Avvia */
     .button-first-line {
       display: flex;
       align-items: center;
@@ -209,7 +209,7 @@
       white-space: nowrap;
     }
 
-    /* Testo piccolo */
+    /* Testo piccolo nel pulsante */
     .button-help {
       display: block;
       width: 100%;
@@ -223,7 +223,7 @@
       opacity: 0.95;
     }
 
-    /* Messaggio di stato */
+    /* Messaggi di stato */
     .status {
       position: absolute;
       top: max(14px, env(safe-area-inset-top));
@@ -254,7 +254,7 @@
       opacity: 1;
     }
 
-    /* Adattamento per schermi più piccoli */
+    /* Adattamento per schermi piccoli */
     @media (max-width: 420px) {
       .start-button {
         width: calc(100% - 48px);
@@ -295,7 +295,7 @@
         playsinline
       ></video>
 
-      <!-- Messaggio di stato -->
+      <!-- Messaggi di stato -->
       <div
         id="status"
         class="status"
@@ -351,18 +351,25 @@
     } from "https://cdn.jsdelivr.net/npm/@heygen/liveavatar-web-sdk@0.0.20/+esm";
 
     /*
-     * Identificativo del tuo embed LiveAvatar.
+     * ID del tuo embed LiveAvatar.
      */
     const EMBED_ID =
       "3a0645eb-a537-44ec-afc2-de5247a06a6d";
 
     /*
-     * Lingua italiana.
+     * Lingua della conversazione.
      */
     const LANGUAGE = "it";
 
     /*
-     * Saluto iniziale pronunciato automaticamente.
+     * Durata massima della conversazione:
+     * 3 minuti = 180 secondi.
+     */
+    const SESSION_DURATION_MS =
+      3 * 60 * 1000;
+
+    /*
+     * Saluto iniziale automatico.
      */
     const INITIAL_GREETING =
       "Ciao! Sono pronto ad ascoltarti. Come posso aiutarti?";
@@ -383,11 +390,13 @@
       document.getElementById("status");
 
     let session = null;
+    let sessionEndTimer = null;
     let starting = false;
     let avatarHasAlreadySpoken = false;
+    let endedByTimer = false;
 
     /*
-     * Mostra un messaggio.
+     * Mostra un messaggio di stato.
      */
     function showStatus(message) {
       status.textContent = message;
@@ -404,7 +413,20 @@
     }
 
     /*
-     * Attiva lo schermo intero.
+     * Elimina il timer della sessione.
+     */
+    function clearSessionEndTimer() {
+      if (sessionEndTimer) {
+        window.clearTimeout(
+          sessionEndTimer
+        );
+
+        sessionEndTimer = null;
+      }
+    }
+
+    /*
+     * Attiva la modalità a schermo intero.
      */
     async function requestFullscreen() {
       if (
@@ -415,8 +437,8 @@
           await document.documentElement.requestFullscreen();
         } catch {
           /*
-           * La conversazione funziona anche se il browser
-           * non permette lo schermo intero.
+           * La conversazione funziona anche se
+           * il browser non permette il fullscreen.
            */
         }
       }
@@ -443,11 +465,14 @@
        */
       permissionStream
         .getTracks()
-        .forEach((track) => track.stop());
+        .forEach((track) => {
+          track.stop();
+        });
     }
 
     /*
-     * Ottiene il token LiveAvatar usando l'ID dell'embed.
+     * Ottiene il token LiveAvatar
+     * utilizzando l'ID dell'embed.
      */
     async function getEmbedSessionToken() {
       const response = await fetch(
@@ -466,7 +491,8 @@
         }
       );
 
-      const result = await response.json();
+      const result =
+        await response.json();
 
       if (
         !response.ok ||
@@ -483,7 +509,7 @@
     }
 
     /*
-     * Avvia la conversazione con un solo clic.
+     * Avvia la conversazione.
      */
     async function startConversation() {
       if (starting) {
@@ -492,8 +518,12 @@
 
       starting = true;
       avatarHasAlreadySpoken = false;
+      endedByTimer = false;
+
+      clearSessionEndTimer();
 
       startButton.disabled = true;
+
       buttonHelp.textContent =
         "Connessione in corso…";
 
@@ -502,8 +532,8 @@
       );
 
       /*
-       * Schermo intero e microfono vengono richiesti
-       * dallo stesso clic.
+       * Fullscreen e microfono vengono richiesti
+       * con lo stesso unico clic.
        */
       const fullscreenPromise =
         requestFullscreen();
@@ -528,12 +558,14 @@
         );
 
         /*
-         * Collega il video e l'audio.
+         * Collega il flusso audio e video.
          */
         session.on(
           SessionEvent.SESSION_STREAM_READY,
           () => {
-            session.attach(avatarVideo);
+            session.attach(
+              avatarVideo
+            );
 
             avatarVideo.classList.add(
               "visible"
@@ -546,7 +578,7 @@
         );
 
         /*
-         * Avatar inizia a parlare.
+         * L'avatar inizia a parlare.
          */
         session.on(
           AgentEventsEnum.AVATAR_SPEAK_STARTED,
@@ -560,32 +592,39 @@
         );
 
         /*
-         * Avatar finisce di parlare.
+         * L'avatar finisce di parlare.
          */
         session.on(
           AgentEventsEnum.AVATAR_SPEAK_ENDED,
           () => {
-            showStatus("Ti ascolto…");
+            showStatus(
+              "Ti ascolto…"
+            );
+
             hideStatusAfter();
           }
         );
 
         /*
-         * Utente sta parlando.
+         * L'utente sta parlando.
          */
         session.on(
           AgentEventsEnum.USER_SPEAK_STARTED,
           () => {
-            showStatus("Ti ascolto…");
+            showStatus(
+              "Ti ascolto…"
+            );
           }
         );
 
         /*
-         * Sessione terminata.
+         * La sessione è terminata.
          */
         session.on(
           SessionEvent.SESSION_DISCONNECTED,
           () => {
+            clearSessionEndTimer();
+
             avatarVideo.classList.remove(
               "visible"
             );
@@ -599,9 +638,15 @@
             buttonHelp.textContent =
               "Tocca per riconnetterti";
 
-            showStatus(
-              "Sessione terminata"
-            );
+            if (endedByTimer) {
+              showStatus(
+                "Tre minuti trascorsi: sessione terminata"
+              );
+            } else {
+              showStatus(
+                "Sessione terminata"
+              );
+            }
 
             starting = false;
           }
@@ -613,7 +658,33 @@
         await session.start();
 
         /*
-         * Nasconde il pulsante iniziale.
+         * Avvia il timer di tre minuti.
+         */
+        sessionEndTimer =
+          window.setTimeout(
+            async () => {
+              endedByTimer = true;
+
+              showStatus(
+                "Tre minuti trascorsi: chiusura della sessione…"
+              );
+
+              if (session) {
+                try {
+                  await session.stop();
+                } catch (error) {
+                  console.error(
+                    "Errore durante la chiusura automatica:",
+                    error
+                  );
+                }
+              }
+            },
+            SESSION_DURATION_MS
+          );
+
+        /*
+         * Nasconde il pulsante centrale.
          */
         startOverlay.classList.add(
           "hidden"
@@ -626,8 +697,8 @@
         hideStatusAfter();
 
         /*
-         * Se LiveAvatar non ha già un saluto configurato,
-         * pronuncia automaticamente la frase italiana.
+         * Se LiveAvatar non ha già pronunciato
+         * un saluto, pronuncia questa frase.
          */
         window.setTimeout(() => {
           if (
@@ -642,6 +713,8 @@
 
       } catch (error) {
         console.error(error);
+
+        clearSessionEndTimer();
 
         startButton.disabled = false;
 
@@ -666,7 +739,7 @@
     }
 
     /*
-     * Unico pulsante di avvio.
+     * Unico pulsante necessario per avviare tutto.
      */
     startButton.addEventListener(
       "click",
@@ -674,11 +747,13 @@
     );
 
     /*
-     * Chiude la sessione quando si lascia la pagina.
+     * Chiude la sessione se si lascia la pagina.
      */
     window.addEventListener(
       "pagehide",
       () => {
+        clearSessionEndTimer();
+
         if (session) {
           session
             .stop()
