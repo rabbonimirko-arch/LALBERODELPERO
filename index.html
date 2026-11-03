@@ -8,7 +8,7 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
-  <title>LiveAvatar italiano</title>
+  <title>Avventure con il supereroe</title>
 
   <style>
     :root {
@@ -26,7 +26,7 @@
       height: 100%;
       margin: 0;
       overflow: hidden;
-      background: #080d15;
+      background: #070b13;
     }
 
     body {
@@ -41,34 +41,50 @@
       width: 100vw;
       height: 100vh;
       height: 100dvh;
+
       background:
         radial-gradient(
-          circle at 50% 45%,
-          #243247 0,
-          #101722 48%,
-          #080d15 100%
+          circle at 50% 42%,
+          #263b5c 0%,
+          #111a29 48%,
+          #070b13 100%
         );
     }
 
-    /* Area verticale in formato 9:16 */
+    /* Area verticale 9:16 */
     .avatar-frame {
       position: relative;
-      width: min(100vw, calc(100dvh * 9 / 16));
-      height: min(100dvh, calc(100vw * 16 / 9));
+
+      width: min(
+        100vw,
+        calc(100dvh * 9 / 16)
+      );
+
+      height: min(
+        100dvh,
+        calc(100vw * 16 / 9)
+      );
+
       aspect-ratio: 9 / 16;
       overflow: hidden;
+
       background: #000;
-      box-shadow: 0 0 70px rgba(0, 0, 0, 0.72);
+
+      box-shadow:
+        0 0 75px rgba(0, 0, 0, 0.78);
+
       isolation: isolate;
     }
 
-    /* Anteprima e video LiveAvatar */
+    /* Immagine e video */
     .avatar-preview,
     .avatar-video {
       position: absolute;
       inset: 0;
+
       width: 100%;
       height: 100%;
+
       object-fit: cover;
     }
 
@@ -80,195 +96,276 @@
       z-index: 1;
       opacity: 0;
       background: #000;
-      transition: opacity 300ms ease;
+
+      transition:
+        opacity 350ms ease;
     }
 
     .avatar-video.visible {
       opacity: 1;
     }
 
-    /* Schermata iniziale */
-    .start-overlay {
+    /* Messaggio superiore */
+    .top-status {
+      position: absolute;
+      top: max(
+        15px,
+        env(safe-area-inset-top)
+      );
+      left: 50%;
+      z-index: 8;
+
+      width: max-content;
+      max-width: calc(100% - 30px);
+
+      padding: 10px 16px;
+
+      border:
+        1px solid
+        rgba(255, 255, 255, 0.22);
+
+      border-radius: 999px;
+
+      background:
+        rgba(0, 0, 0, 0.62);
+
+      color: #fff;
+
+      font-size:
+        clamp(13px, 3.2vw, 17px);
+
+      font-weight: 700;
+      text-align: center;
+
+      transform: translateX(-50%);
+
+      backdrop-filter: blur(9px);
+    }
+
+    .top-status.active {
+      border-color:
+        rgba(64, 231, 151, 0.65);
+
+      box-shadow:
+        0 0 24px
+        rgba(64, 231, 151, 0.25);
+    }
+
+    /* Schermata del conto alla rovescia */
+    .cycle-overlay {
       position: absolute;
       inset: 0;
       z-index: 5;
-      background: rgba(0, 0, 0, 0.30);
-      backdrop-filter: blur(4px);
+
+      display: grid;
+      place-items: center;
+
+      padding: 26px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(2, 7, 17, 0.18),
+          rgba(2, 7, 17, 0.58)
+        );
+
+      backdrop-filter: blur(3px);
+
       transition:
         opacity 300ms ease,
         visibility 300ms ease;
     }
 
-    .start-overlay.hidden {
+    .cycle-overlay.hidden {
       visibility: hidden;
       opacity: 0;
       pointer-events: none;
     }
 
-    /* Pulsante perfettamente centrato */
-    .start-button {
-      position: absolute;
-      top: 50%;
-      left: 50%;
+    /* Cornice del timer */
+    .countdown-card {
+      width: min(100%, 390px);
 
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      padding: 26px 20px 24px;
 
-      gap: 3px;
+      border:
+        3px solid
+        rgba(255, 255, 255, 0.88);
 
-      width: calc(100% - 64px);
-      max-width: 400px;
-      min-height: 138px;
-
-      margin: 0;
-      padding: 20px 18px 18px;
-
-      border: 3px solid rgba(255, 255, 255, 0.9);
-      border-radius: 62px;
+      border-radius: 46px;
 
       background:
         linear-gradient(
-          135deg,
-          #2174ff 0%,
-          #08b8ef 100%
+          145deg,
+          rgba(31, 111, 255, 0.95),
+          rgba(7, 184, 237, 0.95)
         );
 
       color: #fff;
       text-align: center;
-      cursor: pointer;
 
       box-shadow:
-        0 18px 46px rgba(0, 132, 255, 0.48),
-        inset 0 1px 0 rgba(255, 255, 255, 0.32);
-
-      transform: translate(-50%, -50%);
-
-      transition:
-        transform 180ms ease,
-        filter 180ms ease;
+        0 22px 55px
+        rgba(0, 119, 255, 0.42),
+        inset 0 1px 0
+        rgba(255, 255, 255, 0.30);
     }
 
-    .start-button:hover:not(:disabled) {
-      transform:
-        translate(-50%, -50%)
-        scale(1.035);
+    .countdown-eyebrow {
+      margin: 0 0 10px;
 
-      filter: brightness(1.06);
-    }
+      font-size:
+        clamp(13px, 3vw, 17px);
 
-    .start-button:active:not(:disabled) {
-      transform:
-        translate(-50%, -50%)
-        scale(0.985);
-    }
-
-    .start-button:focus-visible {
-      outline: 5px solid #fff;
-      outline-offset: 6px;
-    }
-
-    .start-button:disabled {
-      cursor: wait;
-      opacity: 0.86;
-    }
-
-    /* Prima riga: microfono e Avvia */
-    .button-first-line {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      gap: 10px;
-      width: 100%;
-
-      font-size: clamp(30px, 8vw, 42px);
       font-weight: 800;
-      line-height: 1;
-      text-align: center;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
     }
 
-    .button-first-line svg {
-      flex: 0 0 auto;
-      width: 0.78em;
-      height: 0.78em;
+    .countdown-title {
+      margin: 0;
+
+      font-size:
+        clamp(28px, 7vw, 39px);
+
+      font-weight: 900;
+      line-height: 1.04;
     }
 
-    /* Seconda riga: conversazione */
-    .button-second-line {
-      display: block;
-      width: 100%;
-      max-width: 100%;
+    .countdown-clock {
+      margin: 13px 0 8px;
 
-      font-size: clamp(25px, 6.5vw, 34px);
-      font-weight: 800;
-      line-height: 1.05;
-      text-align: center;
+      font-family:
+        "Arial Black",
+        Arial,
+        Helvetica,
+        sans-serif;
 
-      white-space: nowrap;
+      font-size:
+        clamp(60px, 16vw, 88px);
+
+      font-weight: 900;
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+
+      text-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, 0.22);
+
+      font-variant-numeric:
+        tabular-nums;
     }
 
-    /* Testo piccolo nel pulsante */
-    .button-help {
-      display: block;
-      width: 100%;
-      margin-top: 8px;
+    .countdown-help {
+      margin: 0;
 
-      font-size: clamp(14px, 3.6vw, 19px);
-      font-weight: 400;
-      line-height: 1.2;
-      text-align: center;
+      font-size:
+        clamp(15px, 3.7vw, 19px);
 
-      opacity: 0.95;
+      line-height: 1.3;
     }
 
-    /* Messaggi di stato */
-    .status {
+    /* Schermata per l'eventuale autorizzazione iniziale */
+    .permission-overlay {
       position: absolute;
-      top: max(14px, env(safe-area-inset-top));
-      left: 50%;
-      z-index: 4;
+      inset: 0;
+      z-index: 12;
 
-      max-width: calc(100% - 30px);
-      padding: 9px 15px;
+      display: grid;
+      place-items: center;
 
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 26px;
+
+      background:
+        rgba(3, 8, 17, 0.72);
+
+      backdrop-filter: blur(7px);
+    }
+
+    .permission-overlay.hidden {
+      display: none;
+    }
+
+    .permission-card {
+      width: min(100%, 390px);
+
+      padding: 25px 22px;
+
+      border:
+        2px solid
+        rgba(255, 255, 255, 0.82);
+
+      border-radius: 36px;
+
+      background:
+        rgba(12, 24, 43, 0.95);
+
+      color: #fff;
+      text-align: center;
+
+      box-shadow:
+        0 22px 60px
+        rgba(0, 0, 0, 0.50);
+    }
+
+    .permission-card h2 {
+      margin: 0 0 10px;
+
+      font-size:
+        clamp(24px, 6vw, 34px);
+    }
+
+    .permission-card p {
+      margin: 0 0 20px;
+
+      color:
+        rgba(255, 255, 255, 0.82);
+
+      font-size:
+        clamp(15px, 3.5vw, 18px);
+
+      line-height: 1.35;
+    }
+
+    .permission-button {
+      width: 100%;
+      min-height: 74px;
+
+      padding: 14px 18px;
+
+      border: 2px solid #fff;
       border-radius: 999px;
 
-      background: rgba(0, 0, 0, 0.58);
+      background:
+        linear-gradient(
+          135deg,
+          #2174ff,
+          #08b8ef
+        );
+
       color: #fff;
 
-      font-size: clamp(13px, 3vw, 16px);
-      text-align: center;
+      font-size:
+        clamp(19px, 4.5vw, 25px);
 
-      opacity: 0;
-      transform: translateX(-50%);
-      transition: opacity 200ms ease;
-
-      backdrop-filter: blur(8px);
-      pointer-events: none;
+      font-weight: 800;
+      cursor: pointer;
     }
 
-    .status.visible {
-      opacity: 1;
+    .permission-button:disabled {
+      cursor: wait;
+      opacity: 0.70;
     }
 
-    /* Adattamento per schermi piccoli */
     @media (max-width: 420px) {
-      .start-button {
-        width: calc(100% - 48px);
-        min-height: 124px;
-        padding-inline: 14px;
-        border-radius: 52px;
+      .cycle-overlay,
+      .permission-overlay {
+        padding: 20px;
       }
 
-      .button-first-line {
-        font-size: clamp(28px, 9vw, 38px);
-      }
-
-      .button-second-line {
-        font-size: clamp(23px, 7.5vw, 32px);
+      .countdown-card {
+        padding-inline: 15px;
+        border-radius: 38px;
       }
     }
   </style>
@@ -278,13 +375,13 @@
   <main class="page">
     <section
       class="avatar-frame"
-      aria-label="Conversazione con LiveAvatar"
+      aria-label="Avventura con il supereroe"
     >
-      <!-- Immagine mostrata prima della connessione -->
+      <!-- Immagine visualizzata durante la pausa -->
       <img
         class="avatar-preview"
         src="https://static.liveavatar.com/avatars/thumbnails/fb40cdb567ef4c189038490829c20e6f/thumbnail_263f26b7489e4591a55800ca504ffccb.png"
-        alt="Anteprima dell'avatar"
+        alt="Anteprima del supereroe"
       >
 
       <!-- Video LiveAvatar -->
@@ -295,50 +392,75 @@
         playsinline
       ></video>
 
-      <!-- Messaggi di stato -->
+      <!-- Stato superiore -->
       <div
-        id="status"
-        class="status"
+        id="topStatus"
+        class="top-status"
         role="status"
         aria-live="polite"
-      ></div>
-
-      <!-- Pulsante iniziale -->
-      <div
-        id="startOverlay"
-        class="start-overlay"
       >
-        <button
-          id="startButton"
-          class="start-button"
-          type="button"
-          aria-label="Avvia la conversazione in italiano"
-        >
-          <span class="button-first-line">
-            <svg
-              viewBox="0 0 24 24"
-              aria-hidden="true"
-            >
-              <path
-                fill="currentColor"
-                d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.08A7 7 0 0 1 5 12a1 1 0 1 1 2 0 5 5 0 0 0 10 0Z"
-              />
-            </svg>
+        Preparazione dell'avventura…
+      </div>
 
-            <span>Avvia</span>
-          </span>
-
-          <span class="button-second-line">
-            conversazione
-          </span>
-
-          <span
-            id="buttonHelp"
-            class="button-help"
+      <!-- Conto alla rovescia -->
+      <div
+        id="cycleOverlay"
+        class="cycle-overlay"
+      >
+        <div class="countdown-card">
+          <p
+            id="countdownEyebrow"
+            class="countdown-eyebrow"
           >
-            Tocca una sola volta
-          </span>
-        </button>
+            Il supereroe sta arrivando
+          </p>
+
+          <h1
+            id="countdownTitle"
+            class="countdown-title"
+          >
+            Prossima avventura tra
+          </h1>
+
+          <div
+            id="countdownClock"
+            class="countdown-clock"
+          >
+            00:00
+          </div>
+
+          <p
+            id="countdownHelp"
+            class="countdown-help"
+          >
+            Preparati a parlare con il tuo supereroe!
+          </p>
+        </div>
+      </div>
+
+      <!-- Autorizzazione iniziale -->
+      <div
+        id="permissionOverlay"
+        class="permission-overlay hidden"
+      >
+        <div class="permission-card">
+          <h2>
+            Attiva l'esperienza
+          </h2>
+
+          <p id="permissionMessage">
+            Il browser richiede una sola autorizzazione
+            iniziale per microfono e audio.
+          </p>
+
+          <button
+            id="permissionButton"
+            class="permission-button"
+            type="button"
+          >
+            Abilita e avvia
+          </button>
+        </div>
       </div>
     </section>
   </main>
@@ -357,139 +479,276 @@
       "3a0645eb-a537-44ec-afc2-de5247a06a6d";
 
     /*
-     * Lingua della conversazione.
+     * Lingua italiana.
      */
     const LANGUAGE = "it";
 
     /*
-     * Durata massima della conversazione:
-     * 3 minuti = 180 secondi.
+     * Durata della conversazione:
+     * 3 minuti.
      */
     const SESSION_DURATION_MS =
       3 * 60 * 1000;
 
     /*
-     * Saluto iniziale automatico.
+     * Durata della pausa:
+     * 5 minuti.
+     */
+    const PAUSE_DURATION_MS =
+      5 * 60 * 1000;
+
+    /*
+     * Saluto automatico del supereroe.
      */
     const INITIAL_GREETING =
-      "Ciao! Sono pronto ad ascoltarti. Come posso aiutarti?";
-
-    const startButton =
-      document.getElementById("startButton");
-
-    const buttonHelp =
-      document.getElementById("buttonHelp");
-
-    const startOverlay =
-      document.getElementById("startOverlay");
+      "Ciao! La nostra avventura comincia adesso. Come posso aiutarti?";
 
     const avatarVideo =
-      document.getElementById("avatarVideo");
+      document.getElementById(
+        "avatarVideo"
+      );
 
-    const status =
-      document.getElementById("status");
+    const topStatus =
+      document.getElementById(
+        "topStatus"
+      );
 
-    let session = null;
-    let sessionEndTimer = null;
-    let starting = false;
-    let avatarHasAlreadySpoken = false;
-    let endedByTimer = false;
+    const cycleOverlay =
+      document.getElementById(
+        "cycleOverlay"
+      );
+
+    const countdownEyebrow =
+      document.getElementById(
+        "countdownEyebrow"
+      );
+
+    const countdownTitle =
+      document.getElementById(
+        "countdownTitle"
+      );
+
+    const countdownClock =
+      document.getElementById(
+        "countdownClock"
+      );
+
+    const countdownHelp =
+      document.getElementById(
+        "countdownHelp"
+      );
+
+    const permissionOverlay =
+      document.getElementById(
+        "permissionOverlay"
+      );
+
+    const permissionMessage =
+      document.getElementById(
+        "permissionMessage"
+      );
+
+    const permissionButton =
+      document.getElementById(
+        "permissionButton"
+      );
+
+    let currentSession = null;
+
+    let cycleState = "starting";
+
+    let microphoneAuthorized = false;
+
+    let avatarHasSpoken = false;
+
+    let pageIsClosing = false;
+
+    let sessionStopTimer = null;
+
+    let sessionCountdownTimer = null;
+
+    let pauseStartTimer = null;
+
+    let pauseCountdownTimer = null;
 
     /*
-     * Mostra un messaggio di stato.
+     * Cancella un timer.
      */
-    function showStatus(message) {
-      status.textContent = message;
-      status.classList.add("visible");
+    function clearTimer(timer) {
+      if (timer) {
+        window.clearTimeout(timer);
+      }
+
+      return null;
     }
 
     /*
-     * Nasconde il messaggio dopo alcuni secondi.
+     * Cancella un intervallo.
      */
-    function hideStatusAfter(delay = 2200) {
-      window.setTimeout(() => {
-        status.classList.remove("visible");
-      }, delay);
+    function clearIntervalTimer(timer) {
+      if (timer) {
+        window.clearInterval(timer);
+      }
+
+      return null;
     }
 
     /*
-     * Elimina il timer della sessione.
+     * Cancella i timer della sessione.
      */
-    function clearSessionEndTimer() {
-      if (sessionEndTimer) {
-        window.clearTimeout(
-          sessionEndTimer
+    function clearSessionTimers() {
+      sessionStopTimer =
+        clearTimer(
+          sessionStopTimer
         );
 
-        sessionEndTimer = null;
-      }
+      sessionCountdownTimer =
+        clearIntervalTimer(
+          sessionCountdownTimer
+        );
     }
 
     /*
-     * Attiva la modalità a schermo intero.
+     * Cancella i timer della pausa.
      */
-    async function requestFullscreen() {
-      if (
-        !document.fullscreenElement &&
-        document.documentElement.requestFullscreen
-      ) {
-        try {
-          await document.documentElement.requestFullscreen();
-        } catch {
-          /*
-           * La conversazione funziona anche se
-           * il browser non permette il fullscreen.
-           */
-        }
-      }
+    function clearPauseTimers() {
+      pauseStartTimer =
+        clearTimer(
+          pauseStartTimer
+        );
+
+      pauseCountdownTimer =
+        clearIntervalTimer(
+          pauseCountdownTimer
+        );
+    }
+
+    /*
+     * Converte i millisecondi in minuti e secondi.
+     */
+    function formatTime(milliseconds) {
+      const seconds =
+        Math.max(
+          0,
+          Math.ceil(
+            milliseconds / 1000
+          )
+        );
+
+      const minutesPart =
+        Math.floor(
+          seconds / 60
+        )
+          .toString()
+          .padStart(2, "0");
+
+      const secondsPart =
+        (
+          seconds % 60
+        )
+          .toString()
+          .padStart(2, "0");
+
+      return (
+        minutesPart +
+        ":" +
+        secondsPart
+      );
+    }
+
+    /*
+     * Aggiorna il messaggio superiore.
+     */
+    function setStatus(
+      message,
+      active = false
+    ) {
+      topStatus.textContent =
+        message;
+
+      topStatus.classList.toggle(
+        "active",
+        active
+      );
+    }
+
+    /*
+     * Mostra il pulsante per l'autorizzazione
+     * se il browser blocca microfono o audio.
+     */
+    function showPermissionFallback(
+      message,
+      buttonText = "Abilita e avvia"
+    ) {
+      permissionMessage.textContent =
+        message;
+
+      permissionButton.textContent =
+        buttonText;
+
+      permissionOverlay.classList.remove(
+        "hidden"
+      );
+    }
+
+    /*
+     * Nasconde la richiesta di autorizzazione.
+     */
+    function hidePermissionFallback() {
+      permissionOverlay.classList.add(
+        "hidden"
+      );
     }
 
     /*
      * Richiede l'autorizzazione del microfono.
      */
-    async function requestMicrophonePermission() {
-      if (!navigator.mediaDevices?.getUserMedia) {
+    async function authorizeMicrophone() {
+      if (
+        !navigator.mediaDevices
+          ?.getUserMedia
+      ) {
         throw new Error(
-          "Questo browser non supporta l'accesso al microfono."
+          "Apri questa pagina tramite HTTPS o localhost per usare il microfono."
         );
       }
 
-      const permissionStream =
-        await navigator.mediaDevices.getUserMedia({
-          audio: true
-        });
+      const stream =
+        await navigator.mediaDevices
+          .getUserMedia({
+            audio: true
+          });
 
-      /*
-       * Chiude il controllo iniziale.
-       * L'SDK aprirà il microfono definitivo.
-       */
-      permissionStream
+      stream
         .getTracks()
         .forEach((track) => {
           track.stop();
         });
+
+      microphoneAuthorized = true;
     }
 
     /*
-     * Ottiene il token LiveAvatar
-     * utilizzando l'ID dell'embed.
+     * Ottiene il token della sessione LiveAvatar.
      */
     async function getEmbedSessionToken() {
-      const response = await fetch(
-        "https://api.liveavatar.com/v1/sessions/embed/token",
-        {
-          method: "POST",
+      const response =
+        await fetch(
+          "https://api.liveavatar.com/v1/sessions/embed/token",
+          {
+            method: "POST",
 
-          headers: {
-            "Content-Type": "application/json"
-          },
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
 
-          body: JSON.stringify({
-            embed_id: EMBED_ID,
-            language: LANGUAGE
-          })
-        }
-      );
+            body: JSON.stringify({
+              embed_id: EMBED_ID,
+              language: LANGUAGE
+            })
+          }
+        );
 
       const result =
         await response.json();
@@ -501,7 +760,7 @@
       ) {
         throw new Error(
           result.message ||
-          "Impossibile avviare LiveAvatar."
+          "Impossibile creare la sessione LiveAvatar."
         );
       }
 
@@ -509,61 +768,219 @@
     }
 
     /*
-     * Avvia la conversazione.
+     * Avvia il conto alla rovescia
+     * dei tre minuti di conversazione.
      */
-    async function startConversation() {
-      if (starting) {
+    function beginActiveCountdown() {
+      const sessionEndsAt =
+        Date.now() +
+        SESSION_DURATION_MS;
+
+      const update = () => {
+        const remaining =
+          sessionEndsAt -
+          Date.now();
+
+        setStatus(
+          "Avventura in corso · " +
+          formatTime(remaining),
+          true
+        );
+      };
+
+      update();
+
+      sessionCountdownTimer =
+        window.setInterval(
+          update,
+          250
+        );
+
+      /*
+       * Dopo tre minuti chiude LiveAvatar.
+       */
+      sessionStopTimer =
+        window.setTimeout(
+          async () => {
+            setStatus(
+              "Tre minuti trascorsi · fine dell'avventura"
+            );
+
+            if (currentSession) {
+              try {
+                await currentSession.stop();
+              } catch (error) {
+                console.error(
+                  "Errore durante la chiusura:",
+                  error
+                );
+
+                enterPause();
+              }
+            } else {
+              enterPause();
+            }
+          },
+          SESSION_DURATION_MS
+        );
+    }
+
+    /*
+     * Avvia la pausa di cinque minuti.
+     */
+    function enterPause() {
+      if (
+        pageIsClosing ||
+        cycleState === "pause"
+      ) {
         return;
       }
 
-      starting = true;
-      avatarHasAlreadySpoken = false;
-      endedByTimer = false;
+      cycleState = "pause";
 
-      clearSessionEndTimer();
+      clearSessionTimers();
+      clearPauseTimers();
 
-      startButton.disabled = true;
+      currentSession = null;
 
-      buttonHelp.textContent =
-        "Connessione in corso…";
-
-      showStatus(
-        "Autorizzazione del microfono…"
+      avatarVideo.classList.remove(
+        "visible"
       );
 
+      cycleOverlay.classList.remove(
+        "hidden"
+      );
+
+      countdownEyebrow.textContent =
+        "Il supereroe tornerà";
+
+      countdownTitle.textContent =
+        "Prossima avventura tra";
+
+      countdownHelp.textContent =
+        "Preparati: la prossima conversazione partirà automaticamente.";
+
+      const pauseEndsAt =
+        Date.now() +
+        PAUSE_DURATION_MS;
+
+      const update = () => {
+        const remaining =
+          pauseEndsAt -
+          Date.now();
+
+        const formatted =
+          formatTime(remaining);
+
+        countdownClock.textContent =
+          formatted;
+
+        setStatus(
+          "Pausa · prossima avventura tra " +
+          formatted
+        );
+      };
+
+      update();
+
+      pauseCountdownTimer =
+        window.setInterval(
+          update,
+          250
+        );
+
       /*
-       * Fullscreen e microfono vengono richiesti
-       * con lo stesso unico clic.
+       * Dopo cinque minuti parte
+       * automaticamente una nuova sessione.
        */
-      const fullscreenPromise =
-        requestFullscreen();
+      pauseStartTimer =
+        window.setTimeout(
+          () => {
+            clearPauseTimers();
+            startAutomaticSession();
+          },
+          PAUSE_DURATION_MS
+        );
+    }
+
+    /*
+     * Avvia automaticamente LiveAvatar.
+     */
+    async function startAutomaticSession() {
+      if (
+        pageIsClosing ||
+        cycleState === "connecting" ||
+        cycleState === "active"
+      ) {
+        return;
+      }
+
+      cycleState = "connecting";
+
+      clearPauseTimers();
+      clearSessionTimers();
+
+      avatarHasSpoken = false;
+
+      cycleOverlay.classList.remove(
+        "hidden"
+      );
+
+      countdownEyebrow.textContent =
+        "Il supereroe sta arrivando";
+
+      countdownTitle.textContent =
+        "Connessione in corso";
+
+      countdownClock.textContent =
+        "00:00";
+
+      countdownHelp.textContent =
+        "Tra pochi istanti inizierà una nuova avventura.";
+
+      setStatus(
+        "Connessione al supereroe…"
+      );
 
       try {
-        await requestMicrophonePermission();
-        await fullscreenPromise;
-
-        showStatus(
-          "Connessione all'avatar…"
-        );
+        /*
+         * Richiede il microfono solo se non
+         * è già stato autorizzato.
+         */
+        if (!microphoneAuthorized) {
+          await authorizeMicrophone();
+        }
 
         const token =
           await getEmbedSessionToken();
 
-        session = new LiveAvatarSession(
-          token,
-          {
-            autoKeepAlive: true,
-            voiceChat: {}
-          }
-        );
+        const sessionForThisCycle =
+          new LiveAvatarSession(
+            token,
+            {
+              autoKeepAlive: true,
+              voiceChat: {}
+            }
+          );
+
+        currentSession =
+          sessionForThisCycle;
 
         /*
-         * Collega il flusso audio e video.
+         * Collega il flusso video e audio.
          */
-        session.on(
-          SessionEvent.SESSION_STREAM_READY,
+        sessionForThisCycle.on(
+          SessionEvent
+            .SESSION_STREAM_READY,
           () => {
-            session.attach(
+            if (
+              currentSession !==
+              sessionForThisCycle
+            ) {
+              return;
+            }
+
+            sessionForThisCycle.attach(
               avatarVideo
             );
 
@@ -571,194 +988,204 @@
               "visible"
             );
 
+            /*
+             * Prova a riprodurre l'audio
+             * automaticamente.
+             */
             avatarVideo
               .play()
-              .catch(() => {});
+              .catch((error) => {
+                console.error(
+                  "Audio automatico bloccato:",
+                  error
+                );
+
+                showPermissionFallback(
+                  "Il browser ha bloccato l'audio automatico. Tocca una sola volta per abilitarlo; i cicli successivi saranno automatici.",
+                  "Attiva l'audio"
+                );
+              });
           }
         );
 
         /*
-         * L'avatar inizia a parlare.
+         * Controlla se l'avatar
+         * ha già pronunciato un saluto.
          */
-        session.on(
-          AgentEventsEnum.AVATAR_SPEAK_STARTED,
+        sessionForThisCycle.on(
+          AgentEventsEnum
+            .AVATAR_SPEAK_STARTED,
           () => {
-            avatarHasAlreadySpoken = true;
-
-            showStatus(
-              "L'avatar sta parlando"
-            );
+            avatarHasSpoken = true;
           }
         );
 
         /*
-         * L'avatar finisce di parlare.
+         * Quando la sessione finisce,
+         * parte la pausa di cinque minuti.
          */
-        session.on(
-          AgentEventsEnum.AVATAR_SPEAK_ENDED,
+        sessionForThisCycle.on(
+          SessionEvent
+            .SESSION_DISCONNECTED,
           () => {
-            showStatus(
-              "Ti ascolto…"
-            );
-
-            hideStatusAfter();
-          }
-        );
-
-        /*
-         * L'utente sta parlando.
-         */
-        session.on(
-          AgentEventsEnum.USER_SPEAK_STARTED,
-          () => {
-            showStatus(
-              "Ti ascolto…"
-            );
-          }
-        );
-
-        /*
-         * La sessione è terminata.
-         */
-        session.on(
-          SessionEvent.SESSION_DISCONNECTED,
-          () => {
-            clearSessionEndTimer();
-
-            avatarVideo.classList.remove(
-              "visible"
-            );
-
-            startOverlay.classList.remove(
-              "hidden"
-            );
-
-            startButton.disabled = false;
-
-            buttonHelp.textContent =
-              "Tocca per riconnetterti";
-
-            if (endedByTimer) {
-              showStatus(
-                "Tre minuti trascorsi: sessione terminata"
-              );
-            } else {
-              showStatus(
-                "Sessione terminata"
-              );
+            if (
+              currentSession !==
+                sessionForThisCycle ||
+              pageIsClosing
+            ) {
+              return;
             }
 
-            starting = false;
+            enterPause();
           }
         );
 
         /*
-         * Avvia LiveAvatar.
+         * Avvia la sessione.
          */
-        await session.start();
+        await sessionForThisCycle.start();
 
-        /*
-         * Avvia il timer di tre minuti.
-         */
-        sessionEndTimer =
-          window.setTimeout(
-            async () => {
-              endedByTimer = true;
+        if (
+          currentSession !==
+          sessionForThisCycle
+        ) {
+          return;
+        }
 
-              showStatus(
-                "Tre minuti trascorsi: chiusura della sessione…"
-              );
+        cycleState = "active";
 
-              if (session) {
-                try {
-                  await session.stop();
-                } catch (error) {
-                  console.error(
-                    "Errore durante la chiusura automatica:",
-                    error
-                  );
-                }
-              }
-            },
-            SESSION_DURATION_MS
-          );
-
-        /*
-         * Nasconde il pulsante centrale.
-         */
-        startOverlay.classList.add(
+        cycleOverlay.classList.add(
           "hidden"
         );
 
-        showStatus(
-          "Conversazione attiva in italiano"
-        );
-
-        hideStatusAfter();
+        beginActiveCountdown();
 
         /*
-         * Se LiveAvatar non ha già pronunciato
-         * un saluto, pronuncia questa frase.
+         * Se non è presente un saluto iniziale,
+         * pronuncia automaticamente questa frase.
          */
-        window.setTimeout(() => {
-          if (
-            session &&
-            !avatarHasAlreadySpoken
-          ) {
-            session.repeat(
-              INITIAL_GREETING
-            );
-          }
-        }, 2200);
+        window.setTimeout(
+          () => {
+            if (
+              currentSession ===
+                sessionForThisCycle &&
+              cycleState === "active" &&
+              !avatarHasSpoken
+            ) {
+              sessionForThisCycle.repeat(
+                INITIAL_GREETING
+              );
+            }
+          },
+          2200
+        );
 
       } catch (error) {
         console.error(error);
 
-        clearSessionEndTimer();
-
-        startButton.disabled = false;
-
-        buttonHelp.textContent =
-          "Riprova e consenti il microfono";
+        cycleState =
+          "waiting-for-permission";
 
         if (
-          error?.name === "NotAllowedError"
+          error?.name ===
+          "NotAllowedError"
         ) {
-          showStatus(
-            "Per conversare devi consentire l'uso del microfono."
+          showPermissionFallback(
+            "Consenti l'uso del microfono una sola volta. Dopo l'autorizzazione, tutte le sessioni partiranno automaticamente.",
+            "Consenti microfono"
           );
         } else {
-          showStatus(
+          showPermissionFallback(
             error?.message ||
-            "Errore durante l'avvio della conversazione."
+            "Non è stato possibile avviare la sessione.",
+            "Riprova"
           );
         }
-
-        starting = false;
       }
     }
 
     /*
-     * Unico pulsante necessario per avviare tutto.
+     * Pulsante visualizzato solo se il browser
+     * richiede un'autorizzazione iniziale.
      */
-    startButton.addEventListener(
+    permissionButton.addEventListener(
       "click",
-      startConversation
+      async () => {
+        permissionButton.disabled = true;
+
+        try {
+          if (!microphoneAuthorized) {
+            await authorizeMicrophone();
+          }
+
+          /*
+           * Sblocca l'audio nel browser.
+           */
+          await avatarVideo
+            .play()
+            .catch(() => {});
+
+          hidePermissionFallback();
+
+          /*
+           * Se la sessione non è già attiva,
+           * la avvia automaticamente.
+           */
+          if (
+            cycleState !== "active"
+          ) {
+            cycleState = "ready";
+
+            await startAutomaticSession();
+          }
+
+        } catch (error) {
+          if (
+            error?.name ===
+            "NotAllowedError"
+          ) {
+            permissionMessage.textContent =
+              "L'autorizzazione è stata rifiutata. Abilita il microfono nelle impostazioni del browser e riprova.";
+          } else {
+            permissionMessage.textContent =
+              error?.message ||
+              "Impossibile attivare l'esperienza.";
+          }
+        } finally {
+          permissionButton.disabled = false;
+        }
+      }
     );
 
     /*
-     * Chiude la sessione se si lascia la pagina.
+     * Chiude tutto quando si lascia la pagina.
      */
     window.addEventListener(
       "pagehide",
       () => {
-        clearSessionEndTimer();
+        pageIsClosing = true;
 
-        if (session) {
-          session
+        clearSessionTimers();
+        clearPauseTimers();
+
+        if (currentSession) {
+          currentSession
             .stop()
             .catch(() => {});
         }
+      }
+    );
+
+    /*
+     * Primo avvio automatico.
+     */
+    window.addEventListener(
+      "load",
+      () => {
+        window.setTimeout(
+          startAutomaticSession,
+          500
+        );
       }
     );
   </script>
