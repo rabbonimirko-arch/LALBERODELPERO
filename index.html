@@ -2,11 +2,13 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
-  <title>L albero del Pero</title>
+
+  <title>Avventure con il supereroe</title>
 
   <style>
     :root {
@@ -27,39 +29,70 @@
       background: #070b13;
     }
 
-    body {
-      display: grid;
-      place-items: center;
-    }
-
+    body,
     .page {
       display: grid;
       place-items: center;
+    }
+
+    /* Pagina a tutto schermo */
+    .page {
       width: 100vw;
       height: 100vh;
       height: 100dvh;
+
       background:
-        radial-gradient(circle at 50% 42%, #263b5c 0%, #111a29 48%, #070b13 100%);
+        radial-gradient(
+          circle at 50% 42%,
+          #263b5c 0%,
+          #111a29 48%,
+          #070b13 100%
+        );
     }
 
+    /* Cornice verticale 9:16 */
     .avatar-frame {
       position: relative;
-      width: min(100vw, calc(100dvh * 9 / 16));
-      height: min(100dvh, calc(100vw * 16 / 9));
+
+      width: min(
+        100vw,
+        calc(100dvh * 9 / 16)
+      );
+
+      height: min(
+        100dvh,
+        calc(100vw * 16 / 9)
+      );
+
       aspect-ratio: 9 / 16;
       overflow: hidden;
-      background: #000;
-      box-shadow: 0 0 75px rgba(0, 0, 0, 0.78);
+
+      background: #141b28;
+
+      box-shadow:
+        0 0 75px
+        rgba(0, 0, 0, 0.78);
+
       isolation: isolate;
     }
 
+    /*
+     * Immagine e video LiveAvatar.
+     * L'ingrandimento elimina le bande bianche
+     * incorporate in alto e in basso.
+     */
     .avatar-preview,
     .avatar-video {
       position: absolute;
       inset: 0;
+
       width: 100%;
       height: 100%;
+
       object-fit: cover;
+
+      transform: scale(1.35);
+      transform-origin: center center;
     }
 
     .avatar-preview {
@@ -69,50 +102,196 @@
     .avatar-video {
       z-index: 1;
       opacity: 0;
-      background: #000;
-      transition: opacity 350ms ease;
+
+      background: #141b28;
+
+      transition:
+        opacity 300ms ease;
     }
 
     .avatar-video.visible {
       opacity: 1;
     }
 
+    /* Stato superiore */
     .top-status {
       position: absolute;
-      top: max(15px, env(safe-area-inset-top));
+
+      top: max(
+        16px,
+        env(safe-area-inset-top)
+      );
+
       left: 50%;
-      z-index: 8;
+      z-index: 10;
+
       width: max-content;
-      max-width: calc(100% - 30px);
-      padding: 10px 16px;
-      border: 1px solid rgba(255, 255, 255, 0.22);
+      max-width: calc(100% - 32px);
+
+      padding: 11px 17px;
+
+      border:
+        1px solid
+        rgba(255, 255, 255, 0.26);
+
       border-radius: 999px;
-      background: rgba(0, 0, 0, 0.62);
+
+      background:
+        rgba(10, 17, 29, 0.76);
+
       color: #fff;
-      font-size: clamp(13px, 3.2vw, 17px);
-      font-weight: 700;
+
+      font-size:
+        clamp(14px, 3.2vw, 18px);
+
+      font-weight: 800;
       text-align: center;
+
       transform: translateX(-50%);
+
       backdrop-filter: blur(9px);
     }
 
     .top-status.active {
-      border-color: rgba(64, 231, 151, 0.65);
-      box-shadow: 0 0 24px rgba(64, 231, 151, 0.25);
+      border-color:
+        rgba(64, 231, 151, 0.68);
+
+      box-shadow:
+        0 0 24px
+        rgba(64, 231, 151, 0.28);
     }
 
     .top-status.hidden {
       display: none;
     }
 
-    /* Salvaschermo pubblicitario: visibile soltanto a sistema spento. */
+    /* Schermata conto alla rovescia */
+    .cycle-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 6;
+
+      display: grid;
+      place-items: center;
+
+      padding: 25px;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(4, 12, 27, 0.15),
+          rgba(4, 12, 27, 0.50)
+        );
+
+      backdrop-filter: blur(2px);
+
+      transition:
+        opacity 250ms ease,
+        visibility 250ms ease;
+    }
+
+    .cycle-overlay.hidden {
+      visibility: hidden;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .countdown-card {
+      width: min(100%, 390px);
+
+      padding: 27px 19px 25px;
+
+      border:
+        3px solid
+        rgba(255, 255, 255, 0.90);
+
+      border-radius: 46px;
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(31, 111, 255, 0.96),
+          rgba(7, 184, 237, 0.96)
+        );
+
+      color: #fff;
+      text-align: center;
+
+      box-shadow:
+        0 22px 55px
+        rgba(0, 119, 255, 0.42);
+    }
+
+    .countdown-eyebrow {
+      margin: 0 0 10px;
+
+      font-size:
+        clamp(13px, 3vw, 17px);
+
+      font-weight: 900;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .countdown-title {
+      margin: 0;
+
+      font-size:
+        clamp(28px, 7vw, 39px);
+
+      font-weight: 900;
+      line-height: 1.04;
+    }
+
+    .countdown-clock {
+      margin: 13px 0 8px;
+
+      font-family:
+        "Arial Black",
+        Arial,
+        Helvetica,
+        sans-serif;
+
+      font-size:
+        clamp(60px, 16vw, 88px);
+
+      font-weight: 900;
+      line-height: 0.96;
+      letter-spacing: -0.055em;
+
+      text-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, 0.22);
+
+      font-variant-numeric:
+        tabular-nums;
+    }
+
+    .countdown-help {
+      margin: 0;
+
+      font-size:
+        clamp(15px, 3.7vw, 19px);
+
+      line-height: 1.3;
+    }
+
+    /*
+     * Salvaschermo pubblicitario.
+     * Compare solamente quando il sistema è spento.
+     */
     .screensaver {
       position: absolute;
       inset: 0;
-      z-index: 20;
+      z-index: 30;
+
       overflow: hidden;
+
       background: #020711;
-      transition: opacity 280ms ease, visibility 280ms ease;
+
+      transition:
+        opacity 250ms ease,
+        visibility 250ms ease;
     }
 
     .screensaver.hidden {
@@ -124,62 +303,113 @@
     .screensaver video {
       width: 100%;
       height: 100%;
+
       object-fit: cover;
     }
 
     .screensaver-hint {
       position: absolute;
+
       right: 18px;
       bottom: 18px;
       left: 18px;
+
       padding: 11px 15px;
-      border: 1px solid rgba(255, 255, 255, 0.24);
+
+      border:
+        1px solid
+        rgba(255, 255, 255, 0.28);
+
       border-radius: 999px;
-      background: rgba(0, 0, 0, 0.58);
-      color: rgba(255, 255, 255, 0.92);
-      font-size: clamp(13px, 3vw, 17px);
-      font-weight: 700;
+
+      background:
+        rgba(0, 0, 0, 0.62);
+
+      color: #fff;
+
+      font-size:
+        clamp(13px, 3vw, 17px);
+
+      font-weight: 800;
       text-align: center;
+
       backdrop-filter: blur(8px);
     }
 
-    /* Pannello mostrato quando l'operatore muove il mouse a sistema spento. */
-    .operator-panel {
+    /*
+     * Pannello dell'operatore e
+     * richiesta di autorizzazione.
+     */
+    .operator-panel,
+    .permission-overlay {
       position: absolute;
       inset: 0;
-      z-index: 21;
+      z-index: 31;
+
       display: grid;
       place-items: center;
-      padding: 26px;
-      background: rgba(3, 8, 18, 0.68);
+
+      padding: 25px;
+
+      background:
+        rgba(3, 8, 18, 0.70);
+
       backdrop-filter: blur(8px);
     }
 
-    .operator-panel.hidden {
+    .permission-overlay {
+      z-index: 32;
+    }
+
+    .operator-panel.hidden,
+    .permission-overlay.hidden {
       display: none;
     }
 
-    .operator-card {
+    .operator-card,
+    .permission-card {
       width: min(100%, 400px);
+
       padding: 28px 22px 24px;
-      border: 3px solid rgba(255, 255, 255, 0.88);
+
+      border:
+        3px solid
+        rgba(255, 255, 255, 0.88);
+
       border-radius: 44px;
-      background: linear-gradient(145deg, rgba(10, 35, 78, 0.97), rgba(7, 87, 138, 0.96));
+
+      background:
+        linear-gradient(
+          145deg,
+          rgba(10, 35, 78, 0.97),
+          rgba(7, 87, 138, 0.96)
+        );
+
       color: #fff;
       text-align: center;
-      box-shadow: 0 24px 65px rgba(0, 0, 0, 0.52);
+
+      box-shadow:
+        0 24px 65px
+        rgba(0, 0, 0, 0.52);
     }
 
     .operator-state {
       display: inline-flex;
       align-items: center;
+
       gap: 9px;
+
       margin-bottom: 14px;
       padding: 7px 13px;
+
       border-radius: 999px;
-      background: rgba(0, 0, 0, 0.26);
+
+      background:
+        rgba(0, 0, 0, 0.26);
+
       font-size: 14px;
-      font-weight: 800;
+      font-weight: 900;
+
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
@@ -187,55 +417,105 @@
     .operator-state::before {
       width: 11px;
       height: 11px;
+
       border-radius: 50%;
+
       background: #ff5363;
+
       content: "";
-      box-shadow: 0 0 14px rgba(255, 83, 99, 0.72);
+
+      box-shadow:
+        0 0 14px
+        rgba(255, 83, 99, 0.72);
     }
 
-    .operator-card h1 {
-      margin: 0 0 10px;
-      font-size: clamp(29px, 7vw, 42px);
-      line-height: 1.02;
+    .operator-card h1,
+    .permission-card h2 {
+      margin: 0 0 11px;
+
+      font-size:
+        clamp(28px, 6.8vw, 41px);
+
+      line-height: 1.03;
     }
 
-    .operator-card p {
+    .operator-card p,
+    .permission-card p {
       margin: 0 0 22px;
-      color: rgba(255, 255, 255, 0.82);
-      font-size: clamp(15px, 3.7vw, 19px);
+
+      color:
+        rgba(255, 255, 255, 0.84);
+
+      font-size:
+        clamp(15px, 3.7vw, 19px);
+
       line-height: 1.35;
     }
 
+    /* Pulsanti */
     .system-button {
       width: 100%;
-      min-height: 78px;
+      min-height: 76px;
+
       padding: 15px 18px;
+
       border: 2px solid #fff;
       border-radius: 999px;
+
       color: #fff;
-      font-size: clamp(20px, 4.8vw, 27px);
+
+      font-size:
+        clamp(20px, 4.8vw, 27px);
+
       font-weight: 900;
       cursor: pointer;
     }
 
     .system-button.start {
-      background: linear-gradient(135deg, #11a85a, #43df91);
-      box-shadow: 0 15px 34px rgba(31, 213, 119, 0.28);
+      background:
+        linear-gradient(
+          135deg,
+          #11a85a,
+          #43df91
+        );
+
+      box-shadow:
+        0 15px 34px
+        rgba(31, 213, 119, 0.28);
     }
 
     .system-button.stop {
       min-height: 60px;
-      background: linear-gradient(135deg, #bd2438, #f04b5d);
-      box-shadow: 0 12px 30px rgba(226, 50, 70, 0.28);
-      font-size: clamp(17px, 4vw, 22px);
+
+      background:
+        linear-gradient(
+          135deg,
+          #bd2438,
+          #f04b5d
+        );
+
+      box-shadow:
+        0 12px 30px
+        rgba(226, 50, 70, 0.28);
+
+      font-size:
+        clamp(17px, 4vw, 22px);
     }
 
     .system-button.secondary {
       min-height: 52px;
+
       margin-top: 12px;
-      border-color: rgba(255, 255, 255, 0.42);
-      background: rgba(0, 0, 0, 0.22);
-      font-size: clamp(14px, 3.4vw, 18px);
+
+      border-color:
+        rgba(255, 255, 255, 0.42);
+
+      background:
+        rgba(0, 0, 0, 0.22);
+
+      font-size:
+        clamp(14px, 3.4vw, 18px);
+
       font-weight: 700;
     }
 
@@ -244,14 +524,19 @@
       opacity: 0.62;
     }
 
-    /* Comando di arresto: compare con il movimento del mouse a sistema acceso. */
+    /* Pulsante di arresto a sistema acceso */
     .running-controls {
       position: absolute;
+
       right: 18px;
       bottom: 18px;
       left: 18px;
-      z-index: 18;
-      transition: opacity 200ms ease, visibility 200ms ease;
+
+      z-index: 20;
+
+      transition:
+        opacity 200ms ease,
+        visibility 200ms ease;
     }
 
     .running-controls.hidden {
@@ -260,131 +545,17 @@
       pointer-events: none;
     }
 
-    .cycle-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 5;
-      display: grid;
-      place-items: center;
-      padding: 26px;
-      background:
-        linear-gradient(180deg, rgba(2, 7, 17, 0.18), rgba(2, 7, 17, 0.58));
-      backdrop-filter: blur(3px);
-      transition: opacity 300ms ease, visibility 300ms ease;
-    }
-
-    .cycle-overlay.hidden {
-      visibility: hidden;
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .countdown-card {
-      width: min(100%, 390px);
-      padding: 26px 20px 24px;
-      border: 3px solid rgba(255, 255, 255, 0.88);
-      border-radius: 46px;
-      background: linear-gradient(145deg, rgba(31, 111, 255, 0.95), rgba(7, 184, 237, 0.95));
-      color: #fff;
-      text-align: center;
-      box-shadow:
-        0 22px 55px rgba(0, 119, 255, 0.42),
-        inset 0 1px 0 rgba(255, 255, 255, 0.30);
-    }
-
-    .countdown-eyebrow {
-      margin: 0 0 10px;
-      font-size: clamp(13px, 3vw, 17px);
-      font-weight: 800;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-    }
-
-    .countdown-title {
-      margin: 0;
-      font-size: clamp(28px, 7vw, 39px);
-      font-weight: 900;
-      line-height: 1.04;
-    }
-
-    .countdown-clock {
-      margin: 13px 0 8px;
-      font-family: "Arial Black", Arial, Helvetica, sans-serif;
-      font-size: clamp(60px, 16vw, 88px);
-      font-weight: 900;
-      line-height: 0.96;
-      letter-spacing: -0.055em;
-      text-shadow: 0 5px 18px rgba(0, 0, 0, 0.22);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .countdown-help {
-      margin: 0;
-      font-size: clamp(15px, 3.7vw, 19px);
-      line-height: 1.3;
-    }
-
-    .permission-overlay {
-      position: absolute;
-      inset: 0;
-      z-index: 12;
-      display: grid;
-      place-items: center;
-      padding: 26px;
-      background: rgba(3, 8, 17, 0.72);
-      backdrop-filter: blur(7px);
-    }
-
-    .permission-overlay.hidden {
-      display: none;
-    }
-
-    .permission-card {
-      width: min(100%, 390px);
-      padding: 25px 22px;
-      border: 2px solid rgba(255, 255, 255, 0.82);
-      border-radius: 36px;
-      background: rgba(12, 24, 43, 0.95);
-      color: #fff;
-      text-align: center;
-      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.5);
-    }
-
-    .permission-card h2 {
-      margin: 0 0 10px;
-      font-size: clamp(24px, 6vw, 34px);
-    }
-
-    .permission-card p {
-      margin: 0 0 20px;
-      color: rgba(255, 255, 255, 0.82);
-      font-size: clamp(15px, 3.5vw, 18px);
-      line-height: 1.35;
-    }
-
-    .permission-button {
-      width: 100%;
-      min-height: 74px;
-      padding: 14px 18px;
-      border: 2px solid #fff;
-      border-radius: 999px;
-      background: linear-gradient(135deg, #2174ff, #08b8ef);
-      color: #fff;
-      font-size: clamp(19px, 4.5vw, 25px);
-      font-weight: 800;
-      cursor: pointer;
-    }
-
     @media (max-width: 420px) {
       .cycle-overlay,
-      .permission-overlay,
-      .operator-panel {
-        padding: 20px;
+      .operator-panel,
+      .permission-overlay {
+        padding: 19px;
       }
 
-      .countdown-card {
+      .countdown-card,
+      .operator-card,
+      .permission-card {
         border-radius: 38px;
-        padding-inline: 15px;
       }
     }
   </style>
@@ -392,13 +563,18 @@
 
 <body>
   <main class="page">
-    <section class="avatar-frame" aria-label="Avventura con il supereroe">
+    <section
+      class="avatar-frame"
+      aria-label="Avventura con il supereroe"
+    >
+      <!-- Immagine dello sfondo -->
       <img
         class="avatar-preview"
         src="https://static.liveavatar.com/avatars/thumbnails/fb40cdb567ef4c189038490829c20e6f/thumbnail_263f26b7489e4591a55800ca504ffccb.png"
         alt="Anteprima del supereroe"
       >
 
+      <!-- Video LiveAvatar -->
       <video
         id="avatarVideo"
         class="avatar-video"
@@ -406,7 +582,56 @@
         playsinline
       ></video>
 
-      <div id="screensaver" class="screensaver">
+      <!-- Stato superiore -->
+      <div
+        id="topStatus"
+        class="top-status hidden"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+      <!-- Conto alla rovescia -->
+      <div
+        id="cycleOverlay"
+        class="cycle-overlay hidden"
+      >
+        <div class="countdown-card">
+          <p
+            id="countdownEyebrow"
+            class="countdown-eyebrow"
+          >
+            Il supereroe tornerà
+          </p>
+
+          <h1
+            id="countdownTitle"
+            class="countdown-title"
+          >
+            Prossima avventura tra
+          </h1>
+
+          <div
+            id="countdownClock"
+            class="countdown-clock"
+          >
+            05:00
+          </div>
+
+          <p
+            id="countdownHelp"
+            class="countdown-help"
+          >
+            Preparati: la prossima conversazione
+            partirà automaticamente.
+          </p>
+        </div>
+      </div>
+
+      <!-- Video pubblicitario usato come salvaschermo -->
+      <div
+        id="screensaver"
+        class="screensaver"
+      >
         <video
           id="promoVideo"
           src="video-pubblicitario.mp4"
@@ -416,56 +641,93 @@
           playsinline
           preload="auto"
         ></video>
+
         <div class="screensaver-hint">
-          Muovi il mouse o tocca lo schermo per accedere ai comandi
+          Muovi il mouse o tocca lo schermo
+          per accedere ai comandi
         </div>
       </div>
 
-      <div id="operatorPanel" class="operator-panel hidden">
+      <!-- Pannello di accensione -->
+      <div
+        id="operatorPanel"
+        class="operator-panel hidden"
+      >
         <div class="operator-card">
-          <div class="operator-state">Sistema fermo</div>
-          <h1>Benvenuti al  L' albero del Pero</h1>
+          <div class="operator-state">
+            Sistema fermo
+          </div>
+
+          <h1>
+            Nessun credito utilizzato
+          </h1>
+
           <p>
-            Avvia il sistema soltanto quando è presente il pubblico.
+            Avvia il sistema soltanto quando
+            è presente il pubblico.
           </p>
-          <button id="startSystemButton" class="system-button start" type="button">
+
+          <button
+            id="startSystemButton"
+            class="system-button start"
+            type="button"
+          >
             ▶ Avvia sistema
           </button>
-          <button id="returnToScreensaverButton" class="system-button secondary" type="button">
+
+          <button
+            id="returnToScreensaverButton"
+            class="system-button secondary"
+            type="button"
+          >
             Torna al salvaschermo
           </button>
         </div>
       </div>
 
-      <div id="topStatus" class="top-status" role="status" aria-live="polite">
-        Preparazione dell'avventura…
-      </div>
-
-      <div id="cycleOverlay" class="cycle-overlay">
-        <div class="countdown-card">
-          <p id="countdownEyebrow" class="countdown-eyebrow">Il supereroe sta arrivando</p>
-          <h1 id="countdownTitle" class="countdown-title">Prossima avventura tra</h1>
-          <div id="countdownClock" class="countdown-clock">00:00</div>
-          <p id="countdownHelp" class="countdown-help">
-            Preparati a parlare con il tuo supereroe!
-          </p>
-        </div>
-      </div>
-
-      <div id="permissionOverlay" class="permission-overlay hidden">
+      <!-- Eventuale autorizzazione del browser -->
+      <div
+        id="permissionOverlay"
+        class="permission-overlay hidden"
+      >
         <div class="permission-card">
-          <h2>Attiva l'esperienza</h2>
+          <h2>
+            Attiva l'esperienza
+          </h2>
+
           <p id="permissionMessage">
-            Il browser richiede una sola autorizzazione iniziale per microfono e audio.
+            Il browser richiede una sola autorizzazione
+            iniziale per microfono e audio.
           </p>
-          <button id="permissionButton" class="permission-button" type="button">
+
+          <button
+            id="permissionButton"
+            class="system-button start"
+            type="button"
+          >
             Abilita e avvia
+          </button>
+
+          <button
+            id="permissionStopButton"
+            class="system-button secondary"
+            type="button"
+          >
+            Ferma sistema
           </button>
         </div>
       </div>
 
-      <div id="runningControls" class="running-controls hidden">
-        <button id="stopSystemButton" class="system-button stop" type="button">
+      <!-- Arresto del sistema -->
+      <div
+        id="runningControls"
+        class="running-controls hidden"
+      >
+        <button
+          id="stopSystemButton"
+          class="system-button stop"
+          type="button"
+        >
           ■ Ferma sistema
         </button>
       </div>
@@ -479,396 +741,1003 @@
       SessionEvent
     } from "https://cdn.jsdelivr.net/npm/@heygen/liveavatar-web-sdk@0.0.20/+esm";
 
-    const EMBED_ID = "3a0645eb-a537-44ec-afc2-de5247a06a6d";
+    /*
+     * Configurazione LiveAvatar.
+     */
+    const EMBED_ID =
+      "3a0645eb-a537-44ec-afc2-de5247a06a6d";
+
     const LANGUAGE = "it";
 
-    /* 3 minuti di conversazione e 5 minuti di pausa. */
-    const SESSION_DURATION_MS = 3 * 60 * 1000;
-    const PAUSE_DURATION_MS = 5 * 60 * 1000;
-    const OFF_PANEL_TIMEOUT_MS = 15 * 1000;
-    const RUNNING_CONTROLS_TIMEOUT_MS = 8 * 1000;
+    /*
+     * Durata della conversazione:
+     * 3 minuti.
+     */
+    const SESSION_DURATION_MS =
+      3 * 60 * 1000;
+
+    /*
+     * Durata della pausa:
+     * 5 minuti.
+     */
+    const PAUSE_DURATION_MS =
+      5 * 60 * 1000;
+
+    /*
+     * Dopo 15 secondi senza attività,
+     * ricompare il salvaschermo.
+     */
+    const OFF_PANEL_TIMEOUT_MS =
+      15 * 1000;
+
+    /*
+     * A sistema acceso, il pulsante di arresto
+     * scompare dopo 8 secondi.
+     */
+    const RUNNING_CONTROLS_TIMEOUT_MS =
+      8 * 1000;
 
     const INITIAL_GREETING =
       "Ciao! La nostra avventura comincia adesso. Come posso aiutarti?";
 
-    const avatarVideo = document.getElementById("avatarVideo");
-    const topStatus = document.getElementById("topStatus");
-    const cycleOverlay = document.getElementById("cycleOverlay");
-    const countdownEyebrow = document.getElementById("countdownEyebrow");
-    const countdownTitle = document.getElementById("countdownTitle");
-    const countdownClock = document.getElementById("countdownClock");
-    const countdownHelp = document.getElementById("countdownHelp");
-    const permissionOverlay = document.getElementById("permissionOverlay");
-    const permissionMessage = document.getElementById("permissionMessage");
-    const permissionButton = document.getElementById("permissionButton");
-    const screensaver = document.getElementById("screensaver");
-    const promoVideo = document.getElementById("promoVideo");
-    const operatorPanel = document.getElementById("operatorPanel");
-    const startSystemButton = document.getElementById("startSystemButton");
-    const returnToScreensaverButton = document.getElementById("returnToScreensaverButton");
-    const runningControls = document.getElementById("runningControls");
-    const stopSystemButton = document.getElementById("stopSystemButton");
+    /*
+     * Elementi della pagina.
+     */
+    const avatarVideo =
+      document.getElementById(
+        "avatarVideo"
+      );
 
+    const topStatus =
+      document.getElementById(
+        "topStatus"
+      );
+
+    const cycleOverlay =
+      document.getElementById(
+        "cycleOverlay"
+      );
+
+    const countdownEyebrow =
+      document.getElementById(
+        "countdownEyebrow"
+      );
+
+    const countdownTitle =
+      document.getElementById(
+        "countdownTitle"
+      );
+
+    const countdownClock =
+      document.getElementById(
+        "countdownClock"
+      );
+
+    const countdownHelp =
+      document.getElementById(
+        "countdownHelp"
+      );
+
+    const screensaver =
+      document.getElementById(
+        "screensaver"
+      );
+
+    const promoVideo =
+      document.getElementById(
+        "promoVideo"
+      );
+
+    const operatorPanel =
+      document.getElementById(
+        "operatorPanel"
+      );
+
+    const startSystemButton =
+      document.getElementById(
+        "startSystemButton"
+      );
+
+    const returnToScreensaverButton =
+      document.getElementById(
+        "returnToScreensaverButton"
+      );
+
+    const runningControls =
+      document.getElementById(
+        "runningControls"
+      );
+
+    const stopSystemButton =
+      document.getElementById(
+        "stopSystemButton"
+      );
+
+    const permissionOverlay =
+      document.getElementById(
+        "permissionOverlay"
+      );
+
+    const permissionMessage =
+      document.getElementById(
+        "permissionMessage"
+      );
+
+    const permissionButton =
+      document.getElementById(
+        "permissionButton"
+      );
+
+    const permissionStopButton =
+      document.getElementById(
+        "permissionStopButton"
+      );
+
+    /*
+     * Stato del sistema.
+     */
     let currentSession = null;
+
     let cycleState = "off";
+
     let systemEnabled = false;
+
     let microphoneAuthorized = false;
+
     let avatarHasSpoken = false;
+
     let pageIsClosing = false;
 
+    /*
+     * Timer.
+     */
     let sessionStopTimer = null;
+
     let sessionCountdownTimer = null;
+
     let pauseStartTimer = null;
+
     let pauseCountdownTimer = null;
+
     let offPanelTimer = null;
+
     let runningControlsTimer = null;
 
-    function clearTimer(timer) {
-      if (timer) window.clearTimeout(timer);
+    /*
+     * Cancella un timeout.
+     */
+    function clearTimeoutTimer(timer) {
+      if (timer) {
+        window.clearTimeout(timer);
+      }
+
       return null;
     }
 
+    /*
+     * Cancella un intervallo.
+     */
     function clearIntervalTimer(timer) {
-      if (timer) window.clearInterval(timer);
+      if (timer) {
+        window.clearInterval(timer);
+      }
+
       return null;
     }
 
     function clearSessionTimers() {
-      sessionStopTimer = clearTimer(sessionStopTimer);
-      sessionCountdownTimer = clearIntervalTimer(sessionCountdownTimer);
+      sessionStopTimer =
+        clearTimeoutTimer(
+          sessionStopTimer
+        );
+
+      sessionCountdownTimer =
+        clearIntervalTimer(
+          sessionCountdownTimer
+        );
     }
 
     function clearPauseTimers() {
-      pauseStartTimer = clearTimer(pauseStartTimer);
-      pauseCountdownTimer = clearIntervalTimer(pauseCountdownTimer);
+      pauseStartTimer =
+        clearTimeoutTimer(
+          pauseStartTimer
+        );
+
+      pauseCountdownTimer =
+        clearIntervalTimer(
+          pauseCountdownTimer
+        );
     }
 
     function clearInterfaceTimers() {
-      offPanelTimer = clearTimer(offPanelTimer);
-      runningControlsTimer = clearTimer(runningControlsTimer);
+      offPanelTimer =
+        clearTimeoutTimer(
+          offPanelTimer
+        );
+
+      runningControlsTimer =
+        clearTimeoutTimer(
+          runningControlsTimer
+        );
     }
 
+    /*
+     * Converte i millisecondi
+     * in minuti e secondi.
+     */
     function formatTime(milliseconds) {
-      const seconds = Math.max(0, Math.ceil(milliseconds / 1000));
-      const minutesPart = Math.floor(seconds / 60).toString().padStart(2, "0");
-      const secondsPart = (seconds % 60).toString().padStart(2, "0");
-      return `${minutesPart}:${secondsPart}`;
+      const totalSeconds =
+        Math.max(
+          0,
+          Math.ceil(
+            milliseconds / 1000
+          )
+        );
+
+      const minutes =
+        Math.floor(
+          totalSeconds / 60
+        )
+          .toString()
+          .padStart(2, "0");
+
+      const seconds =
+        (
+          totalSeconds % 60
+        )
+          .toString()
+          .padStart(2, "0");
+
+      return (
+        minutes +
+        ":" +
+        seconds
+      );
     }
 
-    function setStatus(message, active = false) {
-      topStatus.textContent = message;
-      topStatus.classList.toggle("active", active);
+    /*
+     * Aggiorna lo stato superiore.
+     */
+    function setStatus(
+      message,
+      active = false
+    ) {
+      topStatus.textContent =
+        message;
+
+      topStatus.classList.remove(
+        "hidden"
+      );
+
+      topStatus.classList.toggle(
+        "active",
+        active
+      );
     }
 
-    function showPermissionFallback(message, buttonText = "Abilita e avvia") {
-      permissionMessage.textContent = message;
-      permissionButton.textContent = buttonText;
-      permissionOverlay.classList.remove("hidden");
+    /*
+     * Mostra la richiesta
+     * di autorizzazione.
+     */
+    function showPermissionFallback(
+      message,
+      buttonText =
+        "Abilita e avvia"
+    ) {
+      permissionMessage.textContent =
+        message;
+
+      permissionButton.textContent =
+        buttonText;
+
+      permissionOverlay.classList.remove(
+        "hidden"
+      );
     }
 
+    /*
+     * Nasconde la richiesta
+     * di autorizzazione.
+     */
     function hidePermissionFallback() {
-      permissionOverlay.classList.add("hidden");
+      permissionOverlay.classList.add(
+        "hidden"
+      );
     }
 
+    /*
+     * Mostra il video salvaschermo.
+     */
     function showScreensaver() {
-      if (systemEnabled) return;
-
-      offPanelTimer = clearTimer(offPanelTimer);
-      operatorPanel.classList.add("hidden");
-      screensaver.classList.remove("hidden");
-      topStatus.classList.add("hidden");
-      promoVideo.play().catch(() => {});
-    }
-
-    function showOffControls() {
-      if (systemEnabled || pageIsClosing) return;
-
-      screensaver.classList.add("hidden");
-      promoVideo.pause();
-      operatorPanel.classList.remove("hidden");
-      topStatus.classList.add("hidden");
-
-      offPanelTimer = clearTimer(offPanelTimer);
-      offPanelTimer = window.setTimeout(showScreensaver, OFF_PANEL_TIMEOUT_MS);
-    }
-
-    function showRunningControls() {
-      if (!systemEnabled || pageIsClosing) return;
-
-      runningControls.classList.remove("hidden");
-      runningControlsTimer = clearTimer(runningControlsTimer);
-      runningControlsTimer = window.setTimeout(() => {
-        runningControls.classList.add("hidden");
-      }, RUNNING_CONTROLS_TIMEOUT_MS);
-    }
-
-    async function stopSystem() {
-      if (!systemEnabled && cycleState === "off") {
-        showScreensaver();
+      if (
+        systemEnabled ||
+        pageIsClosing
+      ) {
         return;
       }
 
+      offPanelTimer =
+        clearTimeoutTimer(
+          offPanelTimer
+        );
+
+      operatorPanel.classList.add(
+        "hidden"
+      );
+
+      screensaver.classList.remove(
+        "hidden"
+      );
+
+      topStatus.classList.add(
+        "hidden"
+      );
+
+      promoVideo
+        .play()
+        .catch(() => {});
+    }
+
+    /*
+     * Nasconde il salvaschermo e
+     * mostra i comandi dell'operatore.
+     */
+    function showOffControls() {
+      if (
+        systemEnabled ||
+        pageIsClosing
+      ) {
+        return;
+      }
+
+      screensaver.classList.add(
+        "hidden"
+      );
+
+      promoVideo.pause();
+
+      operatorPanel.classList.remove(
+        "hidden"
+      );
+
+      topStatus.classList.add(
+        "hidden"
+      );
+
+      offPanelTimer =
+        clearTimeoutTimer(
+          offPanelTimer
+        );
+
+      offPanelTimer =
+        window.setTimeout(
+          showScreensaver,
+          OFF_PANEL_TIMEOUT_MS
+        );
+    }
+
+    /*
+     * Mostra il pulsante di arresto.
+     */
+    function showRunningControls() {
+      if (
+        !systemEnabled ||
+        pageIsClosing
+      ) {
+        return;
+      }
+
+      runningControls.classList.remove(
+        "hidden"
+      );
+
+      runningControlsTimer =
+        clearTimeoutTimer(
+          runningControlsTimer
+        );
+
+      runningControlsTimer =
+        window.setTimeout(
+          () => {
+            runningControls.classList.add(
+              "hidden"
+            );
+          },
+          RUNNING_CONTROLS_TIMEOUT_MS
+        );
+    }
+
+    /*
+     * Richiede il microfono.
+     */
+    async function authorizeMicrophone() {
+      if (
+        !navigator.mediaDevices
+          ?.getUserMedia
+      ) {
+        throw new Error(
+          "Apri questa pagina tramite HTTPS o localhost per usare il microfono."
+        );
+      }
+
+      const stream =
+        await navigator.mediaDevices
+          .getUserMedia({
+            audio: true
+          });
+
+      stream
+        .getTracks()
+        .forEach((track) => {
+          track.stop();
+        });
+
+      microphoneAuthorized = true;
+    }
+
+    /*
+     * Ottiene il token LiveAvatar.
+     */
+    async function getEmbedSessionToken() {
+      const response =
+        await fetch(
+          "https://api.liveavatar.com/v1/sessions/embed/token",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body: JSON.stringify({
+              embed_id: EMBED_ID,
+              language: LANGUAGE
+            })
+          }
+        );
+
+      const result =
+        await response.json();
+
+      if (
+        !response.ok ||
+        result.code !== 1000 ||
+        !result.data?.session_token
+      ) {
+        throw new Error(
+          result.message ||
+          "Impossibile creare la sessione LiveAvatar."
+        );
+      }
+
+      return result.data.session_token;
+    }
+
+    /*
+     * Spegne completamente il sistema.
+     */
+    async function stopSystem() {
       systemEnabled = false;
       cycleState = "off";
+
       clearSessionTimers();
       clearPauseTimers();
       clearInterfaceTimers();
+
       hidePermissionFallback();
 
-      runningControls.classList.add("hidden");
-      cycleOverlay.classList.add("hidden");
-      avatarVideo.classList.remove("visible");
-      topStatus.classList.add("hidden");
+      cycleOverlay.classList.add(
+        "hidden"
+      );
 
-      const sessionToStop = currentSession;
+      runningControls.classList.add(
+        "hidden"
+      );
+
+      avatarVideo.classList.remove(
+        "visible"
+      );
+
+      topStatus.classList.add(
+        "hidden"
+      );
+
+      const sessionToStop =
+        currentSession;
+
       currentSession = null;
 
       if (sessionToStop) {
         try {
           await sessionToStop.stop();
         } catch (error) {
-          console.error("Errore durante l'arresto del sistema:", error);
+          console.error(
+            "Errore durante l'arresto del sistema:",
+            error
+          );
         }
       }
 
+      /*
+       * Torna al video pubblicitario.
+       */
       showScreensaver();
     }
 
+    /*
+     * Accende il sistema.
+     */
     async function startSystem() {
-      if (systemEnabled) return;
+      if (systemEnabled) {
+        return;
+      }
 
       systemEnabled = true;
       cycleState = "ready";
+
       clearInterfaceTimers();
-      screensaver.classList.add("hidden");
-      operatorPanel.classList.add("hidden");
+
+      screensaver.classList.add(
+        "hidden"
+      );
+
+      operatorPanel.classList.add(
+        "hidden"
+      );
+
       promoVideo.pause();
-      topStatus.classList.remove("hidden");
+
       showRunningControls();
 
       await startAutomaticSession();
     }
 
-    async function authorizeMicrophone() {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        throw new Error("Apri questa pagina tramite HTTPS o localhost per usare il microfono.");
-      }
-
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
-      microphoneAuthorized = true;
-    }
-
-    async function getEmbedSessionToken() {
-      const response = await fetch(
-        "https://api.liveavatar.com/v1/sessions/embed/token",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            embed_id: EMBED_ID,
-            language: LANGUAGE
-          })
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok || result.code !== 1000 || !result.data?.session_token) {
-        throw new Error(result.message || "Impossibile creare la sessione LiveAvatar.");
-      }
-
-      return result.data.session_token;
-    }
-
+    /*
+     * Conto alla rovescia dei
+     * tre minuti di conversazione.
+     */
     function beginActiveCountdown() {
-      if (!systemEnabled) return;
-      const sessionEndsAt = Date.now() + SESSION_DURATION_MS;
+      if (!systemEnabled) {
+        return;
+      }
+
+      const endsAt =
+        Date.now() +
+        SESSION_DURATION_MS;
 
       const update = () => {
-        const remaining = sessionEndsAt - Date.now();
-        setStatus(`Avventura in corso · ${formatTime(remaining)}`, true);
+        setStatus(
+          "Avventura in corso · " +
+          formatTime(
+            endsAt -
+            Date.now()
+          ),
+          true
+        );
       };
 
       update();
-      sessionCountdownTimer = window.setInterval(update, 250);
 
-      sessionStopTimer = window.setTimeout(async () => {
-        setStatus("Tre minuti trascorsi · fine dell'avventura");
+      sessionCountdownTimer =
+        window.setInterval(
+          update,
+          250
+        );
 
-        if (currentSession) {
-          try {
-            await currentSession.stop();
-          } catch (error) {
-            console.error("Errore durante la chiusura della sessione:", error);
-            enterPause();
-          }
-        } else {
-          enterPause();
-        }
-      }, SESSION_DURATION_MS);
+      /*
+       * Dopo tre minuti
+       * chiude la sessione.
+       */
+      sessionStopTimer =
+        window.setTimeout(
+          async () => {
+            setStatus(
+              "Tre minuti trascorsi · fine dell'avventura"
+            );
+
+            if (currentSession) {
+              try {
+                await currentSession.stop();
+              } catch (error) {
+                console.error(
+                  "Errore durante la chiusura:",
+                  error
+                );
+
+                enterPause();
+              }
+            } else {
+              enterPause();
+            }
+          },
+          SESSION_DURATION_MS
+        );
     }
 
+    /*
+     * Avvia la pausa di cinque minuti.
+     */
     function enterPause() {
-      if (!systemEnabled || pageIsClosing || cycleState === "pause") return;
+      if (
+        !systemEnabled ||
+        pageIsClosing ||
+        cycleState === "pause"
+      ) {
+        return;
+      }
 
       cycleState = "pause";
+
       clearSessionTimers();
       clearPauseTimers();
+
       currentSession = null;
 
-      avatarVideo.classList.remove("visible");
-      cycleOverlay.classList.remove("hidden");
+      avatarVideo.classList.remove(
+        "visible"
+      );
 
-      countdownEyebrow.textContent = "Il supereroe tornerà";
-      countdownTitle.textContent = "Prossima avventura tra";
-      countdownHelp.textContent = "Preparati: la prossima conversazione partirà automaticamente.";
+      cycleOverlay.classList.remove(
+        "hidden"
+      );
 
-      const pauseEndsAt = Date.now() + PAUSE_DURATION_MS;
+      countdownEyebrow.textContent =
+        "Il supereroe tornerà";
+
+      countdownTitle.textContent =
+        "Prossima avventura tra";
+
+      countdownHelp.textContent =
+        "Preparati: la prossima conversazione partirà automaticamente.";
+
+      const endsAt =
+        Date.now() +
+        PAUSE_DURATION_MS;
 
       const update = () => {
-        const remaining = pauseEndsAt - Date.now();
-        const formatted = formatTime(remaining);
-        countdownClock.textContent = formatted;
-        setStatus(`Pausa · prossima avventura tra ${formatted}`);
+        const formatted =
+          formatTime(
+            endsAt -
+            Date.now()
+          );
+
+        countdownClock.textContent =
+          formatted;
+
+        setStatus(
+          "Pausa · prossima avventura tra " +
+          formatted
+        );
       };
 
       update();
-      pauseCountdownTimer = window.setInterval(update, 250);
 
-      pauseStartTimer = window.setTimeout(() => {
-        if (!systemEnabled) return;
-        clearPauseTimers();
-        startAutomaticSession();
-      }, PAUSE_DURATION_MS);
+      pauseCountdownTimer =
+        window.setInterval(
+          update,
+          250
+        );
+
+      /*
+       * Dopo cinque minuti
+       * avvia una nuova conversazione.
+       */
+      pauseStartTimer =
+        window.setTimeout(
+          () => {
+            if (!systemEnabled) {
+              return;
+            }
+
+            clearPauseTimers();
+
+            startAutomaticSession();
+          },
+          PAUSE_DURATION_MS
+        );
     }
 
+    /*
+     * Avvia una sessione LiveAvatar.
+     */
     async function startAutomaticSession() {
-      if (!systemEnabled || pageIsClosing || cycleState === "connecting" || cycleState === "active") return;
+      if (
+        !systemEnabled ||
+        pageIsClosing ||
+        cycleState === "connecting" ||
+        cycleState === "active"
+      ) {
+        return;
+      }
 
       cycleState = "connecting";
-      clearPauseTimers();
+
       clearSessionTimers();
+      clearPauseTimers();
+
       avatarHasSpoken = false;
 
-      cycleOverlay.classList.remove("hidden");
-      countdownEyebrow.textContent = "Il supereroe sta arrivando";
-      countdownTitle.textContent = "Connessione in corso";
-      countdownClock.textContent = "00:00";
-      countdownHelp.textContent = "Tra pochi istanti inizierà una nuova avventura.";
-      setStatus("Connessione al supereroe…");
+      cycleOverlay.classList.remove(
+        "hidden"
+      );
+
+      countdownEyebrow.textContent =
+        "Il supereroe sta arrivando";
+
+      countdownTitle.textContent =
+        "Connessione in corso";
+
+      countdownClock.textContent =
+        "00:00";
+
+      countdownHelp.textContent =
+        "Tra pochi istanti inizierà una nuova avventura.";
+
+      setStatus(
+        "Connessione al supereroe…"
+      );
+
+      let sessionForThisCycle = null;
 
       try {
+        /*
+         * Chiede il microfono soltanto
+         * quando l'operatore avvia il sistema.
+         */
         if (!microphoneAuthorized) {
           await authorizeMicrophone();
         }
 
-        const token = await getEmbedSessionToken();
-        const sessionForThisCycle = new LiveAvatarSession(token, {
-          autoKeepAlive: true,
-          voiceChat: {}
-        });
+        const token =
+          await getEmbedSessionToken();
 
-        currentSession = sessionForThisCycle;
+        sessionForThisCycle =
+          new LiveAvatarSession(
+            token,
+            {
+              autoKeepAlive: true,
+              voiceChat: {}
+            }
+          );
 
-        sessionForThisCycle.on(SessionEvent.SESSION_STREAM_READY, () => {
-          if (currentSession !== sessionForThisCycle) return;
+        currentSession =
+          sessionForThisCycle;
 
-          sessionForThisCycle.attach(avatarVideo);
-          avatarVideo.classList.add("visible");
+        /*
+         * Collega audio e video.
+         */
+        sessionForThisCycle.on(
+          SessionEvent
+            .SESSION_STREAM_READY,
+          () => {
+            if (
+              !systemEnabled ||
+              currentSession !==
+                sessionForThisCycle
+            ) {
+              return;
+            }
 
-          avatarVideo.play().catch((error) => {
-            console.error("Riproduzione automatica bloccata:", error);
-            showPermissionFallback(
-              "Il browser ha bloccato l'audio automatico. Tocca una sola volta per abilitarlo; i cicli successivi saranno automatici.",
-              "Attiva l'audio"
+            sessionForThisCycle.attach(
+              avatarVideo
             );
-          });
-        });
 
-        sessionForThisCycle.on(AgentEventsEnum.AVATAR_SPEAK_STARTED, () => {
-          avatarHasSpoken = true;
-        });
+            avatarVideo.classList.add(
+              "visible"
+            );
 
-        sessionForThisCycle.on(SessionEvent.SESSION_DISCONNECTED, () => {
-          if (!systemEnabled || currentSession !== sessionForThisCycle || pageIsClosing) return;
-          enterPause();
-        });
+            avatarVideo
+              .play()
+              .catch((error) => {
+                console.error(
+                  "Audio automatico bloccato:",
+                  error
+                );
 
+                showPermissionFallback(
+                  "Il browser ha bloccato l'audio. Tocca una sola volta per abilitarlo.",
+                  "Attiva audio"
+                );
+              });
+          }
+        );
+
+        /*
+         * Controlla se l'avatar
+         * ha già parlato.
+         */
+        sessionForThisCycle.on(
+          AgentEventsEnum
+            .AVATAR_SPEAK_STARTED,
+          () => {
+            avatarHasSpoken = true;
+          }
+        );
+
+        /*
+         * Quando termina la sessione
+         * avvia la pausa.
+         */
+        sessionForThisCycle.on(
+          SessionEvent
+            .SESSION_DISCONNECTED,
+          () => {
+            if (
+              !systemEnabled ||
+              currentSession !==
+                sessionForThisCycle ||
+              pageIsClosing
+            ) {
+              return;
+            }
+
+            enterPause();
+          }
+        );
+
+        /*
+         * Avvio effettivo della sessione.
+         */
         await sessionForThisCycle.start();
 
-        if (currentSession !== sessionForThisCycle) return;
+        if (
+          !systemEnabled ||
+          currentSession !==
+            sessionForThisCycle
+        ) {
+          return;
+        }
 
         cycleState = "active";
-        cycleOverlay.classList.add("hidden");
+
+        cycleOverlay.classList.add(
+          "hidden"
+        );
+
         showRunningControls();
+
         beginActiveCountdown();
 
-        window.setTimeout(() => {
-          if (
-            currentSession === sessionForThisCycle &&
-            cycleState === "active" &&
-            !avatarHasSpoken
-          ) {
-            sessionForThisCycle.repeat(INITIAL_GREETING);
-          }
-        }, 2200);
+        /*
+         * Saluto iniziale automatico.
+         */
+        window.setTimeout(
+          () => {
+            if (
+              systemEnabled &&
+              currentSession ===
+                sessionForThisCycle &&
+              cycleState === "active" &&
+              !avatarHasSpoken
+            ) {
+              sessionForThisCycle.repeat(
+                INITIAL_GREETING
+              );
+            }
+          },
+          2200
+        );
+
       } catch (error) {
         console.error(error);
-        cycleState = "waiting-for-permission";
 
-        if (error?.name === "NotAllowedError") {
-          showPermissionFallback(
-            "Consenti l'uso del microfono una sola volta. Dopo l'autorizzazione, tutte le sessioni partiranno automaticamente.",
-            "Consenti microfono"
-          );
-        } else {
-          showPermissionFallback(
-            error?.message || "Non è stato possibile avviare la sessione.",
-            "Riprova"
-          );
+        cycleState =
+          "waiting-for-permission";
+
+        if (
+          currentSession ===
+          sessionForThisCycle
+        ) {
+          currentSession = null;
         }
+
+        showPermissionFallback(
+          error?.name === "NotAllowedError"
+            ? "Consenti l'uso del microfono. Dopo la prima autorizzazione i cicli saranno automatici."
+            : (
+                error?.message ||
+                "Non è stato possibile avviare la sessione."
+              ),
+
+          error?.name === "NotAllowedError"
+            ? "Consenti microfono"
+            : "Riprova"
+        );
       }
     }
 
-    permissionButton.addEventListener("click", async () => {
-      permissionButton.disabled = true;
+    /*
+     * Pulsante per autorizzare
+     * microfono o audio.
+     */
+    permissionButton.addEventListener(
+      "click",
+      async () => {
+        permissionButton.disabled = true;
 
-      try {
-        if (!microphoneAuthorized) {
-          await authorizeMicrophone();
+        try {
+          if (!microphoneAuthorized) {
+            await authorizeMicrophone();
+          }
+
+          await avatarVideo
+            .play()
+            .catch(() => {});
+
+          hidePermissionFallback();
+
+          if (
+            systemEnabled &&
+            cycleState !== "active"
+          ) {
+            cycleState = "ready";
+
+            await startAutomaticSession();
+          }
+
+        } catch (error) {
+          permissionMessage.textContent =
+            error?.name ===
+              "NotAllowedError"
+              ? "Autorizzazione rifiutata. Abilita il microfono nel browser e riprova."
+              : (
+                  error?.message ||
+                  "Impossibile attivare l'esperienza."
+                );
+        } finally {
+          permissionButton.disabled = false;
         }
+      }
+    );
 
-        await avatarVideo.play().catch(() => {});
-        hidePermissionFallback();
+    /*
+     * Pulsante verde di accensione.
+     */
+    startSystemButton.addEventListener(
+      "click",
+      async () => {
+        startSystemButton.disabled = true;
 
-        if (cycleState !== "active") {
-          cycleState = "ready";
-          await startAutomaticSession();
+        try {
+          await startSystem();
+        } finally {
+          startSystemButton.disabled = false;
         }
-      } catch (error) {
-        permissionMessage.textContent =
-          error?.name === "NotAllowedError"
-            ? "L'autorizzazione è stata rifiutata. Abilita il microfono nelle impostazioni del browser e riprova."
-            : (error?.message || "Impossibile attivare l'esperienza.");
-      } finally {
-        permissionButton.disabled = false;
       }
-    });
+    );
 
-    startSystemButton.addEventListener("click", async () => {
-      startSystemButton.disabled = true;
+    /*
+     * Pulsanti di spegnimento.
+     */
+    stopSystemButton.addEventListener(
+      "click",
+      stopSystem
+    );
 
-      try {
-        await startSystem();
-      } finally {
-        startSystemButton.disabled = false;
-      }
-    });
+    permissionStopButton.addEventListener(
+      "click",
+      stopSystem
+    );
 
-    stopSystemButton.addEventListener("click", stopSystem);
-    returnToScreensaverButton.addEventListener("click", showScreensaver);
+    /*
+     * Ritorno manuale al salvaschermo.
+     */
+    returnToScreensaverButton
+      .addEventListener(
+        "click",
+        showScreensaver
+      );
 
+    /*
+     * Movimento del mouse o tocco.
+     *
+     * Sistema spento:
+     * mostra il pannello di accensione.
+     *
+     * Sistema acceso:
+     * mostra il pulsante di arresto.
+     */
     function handleOperatorActivity() {
       if (systemEnabled) {
         showRunningControls();
@@ -877,28 +1746,71 @@
       }
     }
 
-    window.addEventListener("mousemove", handleOperatorActivity, { passive: true });
-    window.addEventListener("pointerdown", handleOperatorActivity, { passive: true });
-    window.addEventListener("keydown", handleOperatorActivity);
-
-    window.addEventListener("pagehide", () => {
-      pageIsClosing = true;
-      systemEnabled = false;
-      clearSessionTimers();
-      clearPauseTimers();
-      clearInterfaceTimers();
-
-      if (currentSession) {
-        currentSession.stop().catch(() => {});
+    window.addEventListener(
+      "mousemove",
+      handleOperatorActivity,
+      {
+        passive: true
       }
-    });
+    );
 
-    /* All'apertura il sistema è spento: nessun token e nessun credito. */
-    window.addEventListener("load", () => {
-      cycleOverlay.classList.add("hidden");
-      topStatus.classList.add("hidden");
-      showScreensaver();
-    });
+    window.addEventListener(
+      "pointerdown",
+      handleOperatorActivity,
+      {
+        passive: true
+      }
+    );
+
+    window.addEventListener(
+      "keydown",
+      handleOperatorActivity
+    );
+
+    /*
+     * Chiusura della pagina.
+     */
+    window.addEventListener(
+      "pagehide",
+      () => {
+        pageIsClosing = true;
+        systemEnabled = false;
+
+        clearSessionTimers();
+        clearPauseTimers();
+        clearInterfaceTimers();
+
+        if (currentSession) {
+          currentSession
+            .stop()
+            .catch(() => {});
+        }
+      }
+    );
+
+    /*
+     * Stato iniziale:
+     * salvaschermo attivo,
+     * sistema spento,
+     * nessun credito utilizzato.
+     */
+    window.addEventListener(
+      "load",
+      () => {
+        systemEnabled = false;
+        cycleState = "off";
+
+        cycleOverlay.classList.add(
+          "hidden"
+        );
+
+        topStatus.classList.add(
+          "hidden"
+        );
+
+        showScreensaver();
+      }
+    );
   </script>
 </body>
 </html>
