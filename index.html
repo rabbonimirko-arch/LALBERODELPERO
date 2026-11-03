@@ -34,6 +34,7 @@
       place-items: center;
     }
 
+    /* Pagina a tutto schermo */
     .page {
       display: grid;
       place-items: center;
@@ -49,7 +50,7 @@
         );
     }
 
-    /* Cornice verticale 9:16 */
+    /* Area verticale 9:16 */
     .avatar-frame {
       position: relative;
       width: min(100vw, calc(100dvh * 9 / 16));
@@ -61,6 +62,7 @@
       isolation: isolate;
     }
 
+    /* Anteprima e video dell'avatar */
     .avatar-preview,
     .avatar-video {
       position: absolute;
@@ -90,9 +92,6 @@
       position: absolute;
       inset: 0;
       z-index: 5;
-      display: grid;
-      place-items: center;
-      padding: 22px;
       background: rgba(0, 0, 0, 0.30);
       backdrop-filter: blur(4px);
       transition:
@@ -106,42 +105,63 @@
       pointer-events: none;
     }
 
-    /* Pulsante centrale */
+    /* Pulsante centrato geometricamente */
     .start-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+
       gap: 3px;
-      width: min(100%, 420px);
+
+      width: calc(100% - 64px);
+      max-width: 400px;
       min-height: 138px;
+
       margin: 0;
       padding: 20px 18px 18px;
+
       border: 3px solid rgba(255, 255, 255, 0.9);
       border-radius: 62px;
-      background: linear-gradient(
-        135deg,
-        #2174ff 0%,
-        #08b8ef 100%
-      );
+
+      background:
+        linear-gradient(
+          135deg,
+          #2174ff 0%,
+          #08b8ef 100%
+        );
+
       color: #fff;
       text-align: center;
       cursor: pointer;
+
       box-shadow:
         0 18px 46px rgba(0, 132, 255, 0.48),
         inset 0 1px 0 rgba(255, 255, 255, 0.32);
+
+      transform: translate(-50%, -50%);
+
       transition:
         transform 180ms ease,
         filter 180ms ease;
     }
 
     .start-button:hover:not(:disabled) {
-      transform: scale(1.035);
+      transform:
+        translate(-50%, -50%)
+        scale(1.035);
+
       filter: brightness(1.06);
     }
 
     .start-button:active:not(:disabled) {
-      transform: scale(0.985);
+      transform:
+        translate(-50%, -50%)
+        scale(0.985);
     }
 
     .start-button:focus-visible {
@@ -154,16 +174,19 @@
       opacity: 0.86;
     }
 
-    /* Prima riga del pulsante */
+    /* Prima riga: icona e Avvia */
     .button-first-line {
       display: flex;
       align-items: center;
       justify-content: center;
+
       gap: 10px;
       width: 100%;
-      font-size: clamp(30px, 8.4vw, 45px);
+
+      font-size: clamp(30px, 8vw, 42px);
       font-weight: 800;
       line-height: 1;
+      text-align: center;
     }
 
     .button-first-line svg {
@@ -172,47 +195,57 @@
       height: 0.78em;
     }
 
-    /* Seconda riga del pulsante */
+    /* Seconda riga: conversazione */
     .button-second-line {
       display: block;
       width: 100%;
       max-width: 100%;
-      font-size: clamp(28px, 8.1vw, 43px);
+
+      font-size: clamp(25px, 6.5vw, 34px);
       font-weight: 800;
       line-height: 1.05;
       text-align: center;
-      overflow-wrap: normal;
-      word-break: normal;
+
+      white-space: nowrap;
     }
 
+    /* Testo piccolo */
     .button-help {
       display: block;
       width: 100%;
       margin-top: 8px;
+
       font-size: clamp(14px, 3.6vw, 19px);
       font-weight: 400;
       line-height: 1.2;
       text-align: center;
+
       opacity: 0.95;
     }
 
-    /* Messaggi di stato */
+    /* Messaggio di stato */
     .status {
       position: absolute;
       top: max(14px, env(safe-area-inset-top));
       left: 50%;
       z-index: 4;
+
       max-width: calc(100% - 30px);
       padding: 9px 15px;
+
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 999px;
+
       background: rgba(0, 0, 0, 0.58);
       color: #fff;
+
       font-size: clamp(13px, 3vw, 16px);
       text-align: center;
+
       opacity: 0;
       transform: translateX(-50%);
       transition: opacity 200ms ease;
+
       backdrop-filter: blur(8px);
       pointer-events: none;
     }
@@ -221,15 +254,21 @@
       opacity: 1;
     }
 
+    /* Adattamento per schermi più piccoli */
     @media (max-width: 420px) {
-      .start-overlay {
-        padding: 18px;
-      }
-
       .start-button {
+        width: calc(100% - 48px);
         min-height: 124px;
         padding-inline: 14px;
         border-radius: 52px;
+      }
+
+      .button-first-line {
+        font-size: clamp(28px, 9vw, 38px);
+      }
+
+      .button-second-line {
+        font-size: clamp(23px, 7.5vw, 32px);
       }
     }
   </style>
@@ -241,14 +280,14 @@
       class="avatar-frame"
       aria-label="Conversazione con LiveAvatar"
     >
-      <!-- Anteprima visualizzata prima della connessione -->
+      <!-- Immagine mostrata prima della connessione -->
       <img
         class="avatar-preview"
         src="https://static.liveavatar.com/avatars/thumbnails/fb40cdb567ef4c189038490829c20e6f/thumbnail_263f26b7489e4591a55800ca504ffccb.png"
         alt="Anteprima dell'avatar"
       >
 
-      <!-- Qui viene visualizzato l'avatar in diretta -->
+      <!-- Video LiveAvatar -->
       <video
         id="avatarVideo"
         class="avatar-video"
@@ -256,6 +295,7 @@
         playsinline
       ></video>
 
+      <!-- Messaggio di stato -->
       <div
         id="status"
         class="status"
@@ -263,7 +303,11 @@
         aria-live="polite"
       ></div>
 
-      <div id="startOverlay" class="start-overlay">
+      <!-- Pulsante iniziale -->
+      <div
+        id="startOverlay"
+        class="start-overlay"
+      >
         <button
           id="startButton"
           class="start-button"
@@ -271,7 +315,10 @@
           aria-label="Avvia la conversazione in italiano"
         >
           <span class="button-first-line">
-            <svg viewBox="0 0 24 24" aria-hidden="true">
+            <svg
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
               <path
                 fill="currentColor"
                 d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3Zm5-3a1 1 0 1 1 2 0 7 7 0 0 1-6 6.92V21h3a1 1 0 1 1 0 2H8a1 1 0 1 1 0-2h3v-2.08A7 7 0 0 1 5 12a1 1 0 1 1 2 0 5 5 0 0 0 10 0Z"
@@ -285,7 +332,10 @@
             conversazione
           </span>
 
-          <span id="buttonHelp" class="button-help">
+          <span
+            id="buttonHelp"
+            class="button-help"
+          >
             Tocca una sola volta
           </span>
         </button>
@@ -301,19 +351,18 @@
     } from "https://cdn.jsdelivr.net/npm/@heygen/liveavatar-web-sdk@0.0.20/+esm";
 
     /*
-     * ID del tuo embed LiveAvatar.
+     * Identificativo del tuo embed LiveAvatar.
      */
     const EMBED_ID =
       "3a0645eb-a537-44ec-afc2-de5247a06a6d";
 
     /*
-     * Lingua della conversazione.
+     * Lingua italiana.
      */
     const LANGUAGE = "it";
 
     /*
-     * Saluto pronunciato automaticamente se l'avatar
-     * non possiede già un messaggio iniziale.
+     * Saluto iniziale pronunciato automaticamente.
      */
     const INITIAL_GREETING =
       "Ciao! Sono pronto ad ascoltarti. Come posso aiutarti?";
@@ -337,11 +386,17 @@
     let starting = false;
     let avatarHasAlreadySpoken = false;
 
+    /*
+     * Mostra un messaggio.
+     */
     function showStatus(message) {
       status.textContent = message;
       status.classList.add("visible");
     }
 
+    /*
+     * Nasconde il messaggio dopo alcuni secondi.
+     */
     function hideStatusAfter(delay = 2200) {
       window.setTimeout(() => {
         status.classList.remove("visible");
@@ -349,7 +404,7 @@
     }
 
     /*
-     * Attiva la modalità a schermo intero.
+     * Attiva lo schermo intero.
      */
     async function requestFullscreen() {
       if (
@@ -361,14 +416,14 @@
         } catch {
           /*
            * La conversazione funziona anche se il browser
-           * non permette la modalità a schermo intero.
+           * non permette lo schermo intero.
            */
         }
       }
     }
 
     /*
-     * Richiede l'autorizzazione per utilizzare il microfono.
+     * Richiede l'autorizzazione del microfono.
      */
     async function requestMicrophonePermission() {
       if (!navigator.mediaDevices?.getUserMedia) {
@@ -383,7 +438,8 @@
         });
 
       /*
-       * L'SDK aprirà subito dopo il flusso audio definitivo.
+       * Chiude il controllo iniziale.
+       * L'SDK aprirà il microfono definitivo.
        */
       permissionStream
         .getTracks()
@@ -391,7 +447,7 @@
     }
 
     /*
-     * Ottiene il token utilizzando lo stesso ID dell'embed.
+     * Ottiene il token LiveAvatar usando l'ID dell'embed.
      */
     async function getEmbedSessionToken() {
       const response = await fetch(
@@ -438,38 +494,50 @@
       avatarHasAlreadySpoken = false;
 
       startButton.disabled = true;
-      buttonHelp.textContent = "Connessione in corso…";
+      buttonHelp.textContent =
+        "Connessione in corso…";
 
-      showStatus("Autorizzazione del microfono…");
+      showStatus(
+        "Autorizzazione del microfono…"
+      );
 
       /*
-       * Schermo intero e microfono vengono attivati
-       * dallo stesso clic dell'utente.
+       * Schermo intero e microfono vengono richiesti
+       * dallo stesso clic.
        */
-      const fullscreenPromise = requestFullscreen();
+      const fullscreenPromise =
+        requestFullscreen();
 
       try {
         await requestMicrophonePermission();
         await fullscreenPromise;
 
-        showStatus("Connessione all'avatar…");
+        showStatus(
+          "Connessione all'avatar…"
+        );
 
-        const token = await getEmbedSessionToken();
+        const token =
+          await getEmbedSessionToken();
 
-        session = new LiveAvatarSession(token, {
-          autoKeepAlive: true,
-          voiceChat: {}
-        });
+        session = new LiveAvatarSession(
+          token,
+          {
+            autoKeepAlive: true,
+            voiceChat: {}
+          }
+        );
 
         /*
-         * Collega il flusso video e audio all'elemento video.
+         * Collega il video e l'audio.
          */
         session.on(
           SessionEvent.SESSION_STREAM_READY,
           () => {
             session.attach(avatarVideo);
 
-            avatarVideo.classList.add("visible");
+            avatarVideo.classList.add(
+              "visible"
+            );
 
             avatarVideo
               .play()
@@ -478,18 +546,21 @@
         );
 
         /*
-         * Segnala quando l'avatar sta parlando.
+         * Avatar inizia a parlare.
          */
         session.on(
           AgentEventsEnum.AVATAR_SPEAK_STARTED,
           () => {
             avatarHasAlreadySpoken = true;
-            showStatus("L'avatar sta parlando");
+
+            showStatus(
+              "L'avatar sta parlando"
+            );
           }
         );
 
         /*
-         * Segnala quando l'avatar ha terminato.
+         * Avatar finisce di parlare.
          */
         session.on(
           AgentEventsEnum.AVATAR_SPEAK_ENDED,
@@ -500,7 +571,7 @@
         );
 
         /*
-         * Segnala quando l'utente sta parlando.
+         * Utente sta parlando.
          */
         session.on(
           AgentEventsEnum.USER_SPEAK_STARTED,
@@ -510,33 +581,43 @@
         );
 
         /*
-         * Ripristina il pulsante quando la sessione termina.
+         * Sessione terminata.
          */
         session.on(
           SessionEvent.SESSION_DISCONNECTED,
           () => {
-            avatarVideo.classList.remove("visible");
-            startOverlay.classList.remove("hidden");
+            avatarVideo.classList.remove(
+              "visible"
+            );
+
+            startOverlay.classList.remove(
+              "hidden"
+            );
 
             startButton.disabled = false;
+
             buttonHelp.textContent =
               "Tocca per riconnetterti";
 
-            showStatus("Sessione terminata");
+            showStatus(
+              "Sessione terminata"
+            );
 
             starting = false;
           }
         );
 
         /*
-         * Avvia effettivamente LiveAvatar.
+         * Avvia LiveAvatar.
          */
         await session.start();
 
         /*
          * Nasconde il pulsante iniziale.
          */
-        startOverlay.classList.add("hidden");
+        startOverlay.classList.add(
+          "hidden"
+        );
 
         showStatus(
           "Conversazione attiva in italiano"
@@ -545,15 +626,17 @@
         hideStatusAfter();
 
         /*
-         * Se LiveAvatar non ha già pronunciato un saluto,
-         * fa partire automaticamente questa frase.
+         * Se LiveAvatar non ha già un saluto configurato,
+         * pronuncia automaticamente la frase italiana.
          */
         window.setTimeout(() => {
           if (
             session &&
             !avatarHasAlreadySpoken
           ) {
-            session.repeat(INITIAL_GREETING);
+            session.repeat(
+              INITIAL_GREETING
+            );
           }
         }, 2200);
 
@@ -565,7 +648,9 @@
         buttonHelp.textContent =
           "Riprova e consenti il microfono";
 
-        if (error?.name === "NotAllowedError") {
+        if (
+          error?.name === "NotAllowedError"
+        ) {
           showStatus(
             "Per conversare devi consentire l'uso del microfono."
           );
@@ -581,7 +666,7 @@
     }
 
     /*
-     * Unico pulsante necessario per avviare tutto.
+     * Unico pulsante di avvio.
      */
     startButton.addEventListener(
       "click",
@@ -589,14 +674,18 @@
     );
 
     /*
-     * Chiude correttamente la sessione quando
-     * la pagina viene chiusa.
+     * Chiude la sessione quando si lascia la pagina.
      */
-    window.addEventListener("pagehide", () => {
-      if (session) {
-        session.stop().catch(() => {});
+    window.addEventListener(
+      "pagehide",
+      () => {
+        if (session) {
+          session
+            .stop()
+            .catch(() => {});
+        }
       }
-    });
+    );
   </script>
 </body>
 </html>
