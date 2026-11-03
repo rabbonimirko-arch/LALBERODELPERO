@@ -61,7 +61,7 @@
       height: 100%;
       object-fit: cover;
       transform: scale(1.35);
-      transform-origin: center center;
+      transform-origin: center;
     }
 
     .avatar-preview {
@@ -338,10 +338,6 @@
       transition: opacity 200ms ease, visibility 200ms ease;
     }
 
-    .running-controls .system-button {
-      width: auto;
-    }
-
     .running-controls.hidden {
       visibility: hidden;
       opacity: 0;
@@ -364,13 +360,11 @@
       .top-status {
         top: max(10px, env(safe-area-inset-top));
         left: 10px;
-        max-width: calc(100% - 20px);
       }
 
       .running-controls {
         bottom: 10px;
         left: 10px;
-        max-width: calc(100% - 20px);
       }
     }
   </style>
@@ -423,7 +417,7 @@
       <div id="screensaver" class="screensaver">
         <video
           id="promoVideo"
-          src="video-pubblicitario.mp4"
+          src="video-pubblicitario.mp4?v=2"
           autoplay
           muted
           loop
@@ -524,57 +518,24 @@
     const INITIAL_GREETING =
       "Ciao! La nostra avventura comincia adesso. Come posso aiutarti?";
 
-    const avatarVideo =
-      document.getElementById("avatarVideo");
-
-    const topStatus =
-      document.getElementById("topStatus");
-
-    const cycleOverlay =
-      document.getElementById("cycleOverlay");
-
-    const countdownEyebrow =
-      document.getElementById("countdownEyebrow");
-
-    const countdownTitle =
-      document.getElementById("countdownTitle");
-
-    const countdownClock =
-      document.getElementById("countdownClock");
-
-    const countdownHelp =
-      document.getElementById("countdownHelp");
-
-    const screensaver =
-      document.getElementById("screensaver");
-
-    const promoVideo =
-      document.getElementById("promoVideo");
-
-    const operatorPanel =
-      document.getElementById("operatorPanel");
-
-    const startSystemButton =
-      document.getElementById("startSystemButton");
-
+    const avatarVideo = document.getElementById("avatarVideo");
+    const topStatus = document.getElementById("topStatus");
+    const cycleOverlay = document.getElementById("cycleOverlay");
+    const countdownEyebrow = document.getElementById("countdownEyebrow");
+    const countdownTitle = document.getElementById("countdownTitle");
+    const countdownClock = document.getElementById("countdownClock");
+    const countdownHelp = document.getElementById("countdownHelp");
+    const screensaver = document.getElementById("screensaver");
+    const promoVideo = document.getElementById("promoVideo");
+    const operatorPanel = document.getElementById("operatorPanel");
+    const startSystemButton = document.getElementById("startSystemButton");
     const returnToScreensaverButton =
       document.getElementById("returnToScreensaverButton");
-
-    const runningControls =
-      document.getElementById("runningControls");
-
-    const stopSystemButton =
-      document.getElementById("stopSystemButton");
-
-    const permissionOverlay =
-      document.getElementById("permissionOverlay");
-
-    const permissionMessage =
-      document.getElementById("permissionMessage");
-
-    const permissionButton =
-      document.getElementById("permissionButton");
-
+    const runningControls = document.getElementById("runningControls");
+    const stopSystemButton = document.getElementById("stopSystemButton");
+    const permissionOverlay = document.getElementById("permissionOverlay");
+    const permissionMessage = document.getElementById("permissionMessage");
+    const permissionButton = document.getElementById("permissionButton");
     const permissionStopButton =
       document.getElementById("permissionStopButton");
 
@@ -593,41 +554,29 @@
     let runningControlsTimer = null;
 
     function clearTimeoutTimer(timer) {
-      if (timer) {
-        window.clearTimeout(timer);
-      }
-
+      if (timer) window.clearTimeout(timer);
       return null;
     }
 
     function clearIntervalTimer(timer) {
-      if (timer) {
-        window.clearInterval(timer);
-      }
-
+      if (timer) window.clearInterval(timer);
       return null;
     }
 
     function clearSessionTimers() {
-      sessionStopTimer =
-        clearTimeoutTimer(sessionStopTimer);
-
+      sessionStopTimer = clearTimeoutTimer(sessionStopTimer);
       sessionCountdownTimer =
         clearIntervalTimer(sessionCountdownTimer);
     }
 
     function clearPauseTimers() {
-      pauseStartTimer =
-        clearTimeoutTimer(pauseStartTimer);
-
+      pauseStartTimer = clearTimeoutTimer(pauseStartTimer);
       pauseCountdownTimer =
         clearIntervalTimer(pauseCountdownTimer);
     }
 
     function clearInterfaceTimers() {
-      offPanelTimer =
-        clearTimeoutTimer(offPanelTimer);
-
+      offPanelTimer = clearTimeoutTimer(offPanelTimer);
       runningControlsTimer =
         clearTimeoutTimer(runningControlsTimer);
     }
@@ -669,13 +618,9 @@
     }
 
     function showScreensaver() {
-      if (systemEnabled || pageIsClosing) {
-        return;
-      }
+      if (systemEnabled || pageIsClosing) return;
 
-      offPanelTimer =
-        clearTimeoutTimer(offPanelTimer);
-
+      offPanelTimer = clearTimeoutTimer(offPanelTimer);
       operatorPanel.classList.add("hidden");
       screensaver.classList.remove("hidden");
       topStatus.classList.add("hidden");
@@ -684,39 +629,30 @@
     }
 
     function showOffControls() {
-      if (systemEnabled || pageIsClosing) {
-        return;
-      }
+      if (systemEnabled || pageIsClosing) return;
 
       screensaver.classList.add("hidden");
       promoVideo.pause();
       operatorPanel.classList.remove("hidden");
       topStatus.classList.add("hidden");
 
-      offPanelTimer =
-        clearTimeoutTimer(offPanelTimer);
-
-      offPanelTimer =
-        window.setTimeout(
-          showScreensaver,
-          OFF_PANEL_TIMEOUT_MS
-        );
+      offPanelTimer = clearTimeoutTimer(offPanelTimer);
+      offPanelTimer = window.setTimeout(
+        showScreensaver,
+        OFF_PANEL_TIMEOUT_MS
+      );
     }
 
     function showRunningControls() {
-      if (!systemEnabled || pageIsClosing) {
-        return;
-      }
+      if (!systemEnabled || pageIsClosing) return;
 
       runningControls.classList.remove("hidden");
-
       runningControlsTimer =
         clearTimeoutTimer(runningControlsTimer);
 
-      runningControlsTimer =
-        window.setTimeout(() => {
-          runningControls.classList.add("hidden");
-        }, RUNNING_CONTROLS_TIMEOUT_MS);
+      runningControlsTimer = window.setTimeout(() => {
+        runningControls.classList.add("hidden");
+      }, RUNNING_CONTROLS_TIMEOUT_MS);
     }
 
     async function authorizeMicrophone() {
@@ -731,10 +667,7 @@
           audio: true
         });
 
-      stream
-        .getTracks()
-        .forEach((track) => track.stop());
-
+      stream.getTracks().forEach((track) => track.stop());
       microphoneAuthorized = true;
     }
 
@@ -801,9 +734,7 @@
     }
 
     async function startSystem() {
-      if (systemEnabled) {
-        return;
-      }
+      if (systemEnabled) return;
 
       systemEnabled = true;
       cycleState = "ready";
@@ -819,12 +750,9 @@
     }
 
     function beginActiveCountdown() {
-      if (!systemEnabled) {
-        return;
-      }
+      if (!systemEnabled) return;
 
-      const endsAt =
-        Date.now() + SESSION_DURATION_MS;
+      const endsAt = Date.now() + SESSION_DURATION_MS;
 
       const update = () => {
         setStatus(
@@ -878,7 +806,6 @@
       clearPauseTimers();
 
       currentSession = null;
-
       avatarVideo.classList.remove("visible");
       cycleOverlay.classList.remove("hidden");
 
@@ -891,8 +818,7 @@
       countdownHelp.textContent =
         "Preparati: la prossima conversazione partirà automaticamente.";
 
-      const endsAt =
-        Date.now() + PAUSE_DURATION_MS;
+      const endsAt = Date.now() + PAUSE_DURATION_MS;
 
       const update = () => {
         const formatted =
@@ -912,9 +838,7 @@
 
       pauseStartTimer =
         window.setTimeout(() => {
-          if (!systemEnabled) {
-            return;
-          }
+          if (!systemEnabled) return;
 
           clearPauseTimers();
           startAutomaticSession();
@@ -939,15 +863,11 @@
       avatarHasSpoken = false;
 
       cycleOverlay.classList.remove("hidden");
-
       countdownEyebrow.textContent =
         "Il supereroe sta arrivando";
-
       countdownTitle.textContent =
         "Connessione in corso";
-
       countdownClock.textContent = "00:00";
-
       countdownHelp.textContent =
         "Tra pochi istanti inizierà una nuova avventura.";
 
@@ -960,8 +880,7 @@
           await authorizeMicrophone();
         }
 
-        const token =
-          await getEmbedSessionToken();
+        const token = await getEmbedSessionToken();
 
         sessionForThisCycle =
           new LiveAvatarSession(token, {
@@ -1082,7 +1001,6 @@
           }
 
           await avatarVideo.play().catch(() => {});
-
           hidePermissionFallback();
 
           if (
