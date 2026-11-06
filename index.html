@@ -421,6 +421,7 @@
           id="promoVideo"
           src="video-pubblicitario.mp4?v=3"
           autoplay
+          muted
           loop
           playsinline
           preload="auto"
@@ -648,3 +649,519 @@
         );
 
       const minutes =
+        Math.floor(totalSeconds / 60)
+          .toString()
+          .padStart(2, "0");
+
+      const seconds =
+        (totalSeconds % 60)
+          .toString()
+          .padStart(2, "0");
+
+      return `${minutes}:${seconds}`;
+    }
+
+    function setStatus(message, active = false) {
+      topStatus.textContent = message;
+      topStatus.classList.remove("hidden");
+      topStatus.classList.toggle("active", active);
+    }
+
+    function showPermissionFallback(
+      message,
+      buttonText = "Abilita e avvia"
+    ) {
+      permissionMessage.textContent = message;
+      permissionButton.textContent = buttonText;
+      permissionOverlay.classList.remove("hidden");
+    }
+
+    function hidePermissionFallback() {
+      permissionOverlay.classList.add("hidden");
+    }
+
+    function showScreensaver() {
+      if (systemEnabled || pageIsClosing) return;
+
+      offPanelTimer = clearTimeoutTimer(offPanelTimer);
+      operatorPanel.classList.add("hidden");
+      screensaver.classList.remove("hidden");
+      topStatus.classList.add("hidden");
+
+      promoVideo.play().catch(() => {});
+    }
+
+    function showOffControls() {
+      if (systemEnabled || pageIsClosing) return;
+
+      screensaver.classList.add("hidden");
+      promoVideo.pause();
+      operatorPanel.classList.remove("hidden");
+      topStatus.classList.add("hidden");
+
+      offPanelTimer = clearTimeoutTimer(offPanelTimer);
+      offPanelTimer = window.setTimeout(
+        showScreensaver,
+        OFF_PANEL_TIMEOUT_MS
+      );
+    }
+
+    function showRunningControls() {
+      if (!systemEnabled || pageIsClosing) return;
+
+      runningControls.classList.remove("hidden");
+      runningControlsTimer =
+        clearTimeoutTimer(runningControlsTimer);
+
+      runningControlsTimer = window.setTimeout(() => {
+        runningControls.classList.add("hidden");
+      }, RUNNING_CONTROLS_TIMEOUT_MS);
+    }
+
+    async function authorizeMicrophone() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        throw new Error(
+          "Apri questa pagina tramite HTTPS o localhost per usare il microfono."
+        );
+      }
+
+      const stream =
+        await navigator.mediaDevices.getUserMedia({
+          audio: true
+        });
+
+      stream.getTracks().forEach((track) => track.stop());
+      microphoneAuthorized = true;
+    }
+
+    async function getEmbedSessionToken() {
+      const response = await fetch(
+        "https://api.liveavatar.com/v1/sessions/embed/token",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            embed_id: EMBED_ID,
+            language: LANGUAGE
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (
+        !response.ok ||
+        result.code !== 1000 ||
+        !result.data?.session_token
+      ) {
+        throw new Error(
+          result.message ||
+          "Impossibile creare la sessione LiveAvatar."
+        );
+      }
+
+      return result.data.session_token;
+    }
+
+    async function stopSystem() {
+      systemEnabled = false;
+      cycleState = "off";
+
+      clearSessionTimers();
+      clearPauseTimers();
+      clearInterfaceTimers();
+      hidePermissionFallback();
+
+      cycleOverlay.classList.add("hidden");
+      runningControls.classList.add("hidden");
+      avatarVideo.classList.remove("visible");
+      topStatus.classList.add("hidden");
+
+      const sessionToStop = currentSession;
+      currentSession = null;
+
+      if (sessionToStop) {
+        try {
+          await sessionToStop.stop();
+        } catch (error) {
+          console.error(
+            "Errore durante l'arresto del sistema:",
+            error
+          );
+        }
+      }
+
+      showScreensaver();
+    }
+
+    async function startSystem() {
+      if (systemEnabled) return;
+
+      systemEnabled = true;
+      cycleState = "ready";
+
+      clearInterfaceTimers();
+
+      screensaver.classList.add("hidden");
+      operatorPanel.classList.add("hidden");
+      promoVideo.pause();
+
+      showRunningControls();
+      await startAutomaticSession();
+    }
+
+    function beginActiveCountdown() {
+      if (!systemEnabled) return;
+
+      const endsAt = Date.now() + SESSION_DURATION_MS;
+
+      const update = () => {
+        setStatus(
+          `Avventura in corso · ${formatTime(
+            endsAt - Date.now()
+          )}`,
+          true
+        );
+      };
+
+      update();
+
+      sessionCountdownTimer =
+        window.setInterval(update, 250);
+
+      sessionStopTimer =
+        window.setTimeout(async () => {
+          setStatus(
+            "Tre minuti trascorsi · fine dell'avventura"
+          );
+
+          if (currentSession) {
+            try {
+              await currentSession.stop();
+            } catch (error) {
+              console.error(
+                "Errore durante la chiusura:",
+                error
+              );
+
+              enterPause();
+            }
+          } else {
+            enterPause();
+          }
+        }, SESSION_DURATION_MS);
+    }
+
+    function enterPause() {
+      if (
+        !systemEnabled ||
+        pageIsClosing ||
+        cycleState === "pause"
+      ) {
+        return;
+      }
+
+      cycleState = "pause";
+
+      clearSessionTimers();
+      clearPauseTimers();
+
+      currentSession = null;
+      avatarVideo.classList.remove("visible");
+      cycleOverlay.classList.remove("hidden");
+
+      countdownEyebrow.textContent =
+        "Il supereroe tornerà";
+
+      countdownTitle.textContent =
+        "Prossima avventura tra";
+
+      countdownHelp.textContent =
+        "Preparati: la prossima conversazione partirà automaticamente.";
+
+      const endsAt = Date.now() + PAUSE_DURATION_MS;
+
+      const update = () => {
+        const formatted =
+          formatTime(endsAt - Date.now());
+
+        countdownClock.textContent = formatted;
+
+        setStatus(
+          `Pausa · prossima avventura tra ${formatted}`
+        );
+      };
+
+      update();
+
+      pauseCountdownTimer =
+        window.setInterval(update, 250);
+
+      pauseStartTimer =
+        window.setTimeout(() => {
+          if (!systemEnabled) return;
+
+          clearPauseTimers();
+          startAutomaticSession();
+        }, PAUSE_DURATION_MS);
+    }
+
+    async function startAutomaticSession() {
+      if (
+        !systemEnabled ||
+        pageIsClosing ||
+        cycleState === "connecting" ||
+        cycleState === "active"
+      ) {
+        return;
+      }
+
+      cycleState = "connecting";
+
+      clearSessionTimers();
+      clearPauseTimers();
+
+      avatarHasSpoken = false;
+
+      cycleOverlay.classList.remove("hidden");
+      countdownEyebrow.textContent =
+        "Il supereroe sta arrivando";
+      countdownTitle.textContent =
+        "Connessione in corso";
+      countdownClock.textContent = "00:00";
+      countdownHelp.textContent =
+        "Tra pochi istanti inizierà una nuova avventura.";
+
+      setStatus("Connessione al supereroe…");
+
+      let sessionForThisCycle = null;
+
+      try {
+        if (!microphoneAuthorized) {
+          await authorizeMicrophone();
+        }
+
+        const token = await getEmbedSessionToken();
+
+        sessionForThisCycle =
+          new LiveAvatarSession(token, {
+            autoKeepAlive: true,
+            voiceChat: {}
+          });
+
+        currentSession = sessionForThisCycle;
+
+        sessionForThisCycle.on(
+          SessionEvent.SESSION_STREAM_READY,
+          () => {
+            if (
+              !systemEnabled ||
+              currentSession !== sessionForThisCycle
+            ) {
+              return;
+            }
+
+            sessionForThisCycle.attach(avatarVideo);
+            avatarVideo.classList.add("visible");
+
+            avatarVideo.play().catch((error) => {
+              console.error(
+                "Audio automatico bloccato:",
+                error
+              );
+
+              showPermissionFallback(
+                "Il browser ha bloccato l'audio. Tocca una sola volta per abilitarlo.",
+                "Attiva audio"
+              );
+            });
+          }
+        );
+
+        sessionForThisCycle.on(
+          AgentEventsEnum.AVATAR_SPEAK_STARTED,
+          () => {
+            avatarHasSpoken = true;
+          }
+        );
+
+        sessionForThisCycle.on(
+          SessionEvent.SESSION_DISCONNECTED,
+          () => {
+            if (
+              !systemEnabled ||
+              currentSession !== sessionForThisCycle ||
+              pageIsClosing
+            ) {
+              return;
+            }
+
+            enterPause();
+          }
+        );
+
+        await sessionForThisCycle.start();
+
+        if (
+          !systemEnabled ||
+          currentSession !== sessionForThisCycle
+        ) {
+          return;
+        }
+
+        cycleState = "active";
+        cycleOverlay.classList.add("hidden");
+
+        showRunningControls();
+        beginActiveCountdown();
+
+        window.setTimeout(() => {
+          if (
+            systemEnabled &&
+            currentSession === sessionForThisCycle &&
+            cycleState === "active" &&
+            !avatarHasSpoken
+          ) {
+            sessionForThisCycle.repeat(
+              INITIAL_GREETING
+            );
+          }
+        }, 2200);
+
+      } catch (error) {
+        console.error(error);
+
+        cycleState = "waiting-for-permission";
+
+        if (currentSession === sessionForThisCycle) {
+          currentSession = null;
+        }
+
+        showPermissionFallback(
+          error?.name === "NotAllowedError"
+            ? "Consenti l'uso del microfono. Dopo la prima autorizzazione i cicli saranno automatici."
+            : (
+                error?.message ||
+                "Non è stato possibile avviare la sessione."
+              ),
+          error?.name === "NotAllowedError"
+            ? "Consenti microfono"
+            : "Riprova"
+        );
+      }
+    }
+
+    permissionButton.addEventListener(
+      "click",
+      async () => {
+        permissionButton.disabled = true;
+
+        try {
+          if (!microphoneAuthorized) {
+            await authorizeMicrophone();
+          }
+
+          await avatarVideo.play().catch(() => {});
+          hidePermissionFallback();
+
+          if (
+            systemEnabled &&
+            cycleState !== "active"
+          ) {
+            cycleState = "ready";
+            await startAutomaticSession();
+          }
+        } catch (error) {
+          permissionMessage.textContent =
+            error?.name === "NotAllowedError"
+              ? "Autorizzazione rifiutata. Abilita il microfono nel browser e riprova."
+              : (
+                  error?.message ||
+                  "Impossibile attivare l'esperienza."
+                );
+        } finally {
+          permissionButton.disabled = false;
+        }
+      }
+    );
+
+    startSystemButton.addEventListener(
+      "click",
+      async () => {
+        startSystemButton.disabled = true;
+
+        try {
+          await startSystem();
+        } finally {
+          startSystemButton.disabled = false;
+        }
+      }
+    );
+
+    stopSystemButton.addEventListener(
+      "click",
+      stopSystem
+    );
+
+    permissionStopButton.addEventListener(
+      "click",
+      stopSystem
+    );
+
+    returnToScreensaverButton.addEventListener(
+      "click",
+      showScreensaver
+    );
+
+    function handleOperatorActivity() {
+      if (systemEnabled) {
+        showRunningControls();
+      } else {
+        showOffControls();
+      }
+    }
+
+    window.addEventListener(
+      "mousemove",
+      handleOperatorActivity,
+      { passive: true }
+    );
+
+    window.addEventListener(
+      "pointerdown",
+      handleOperatorActivity,
+      { passive: true }
+    );
+
+    window.addEventListener(
+      "keydown",
+      handleOperatorActivity
+    );
+
+    window.addEventListener("pagehide", () => {
+      pageIsClosing = true;
+      systemEnabled = false;
+
+      clearSessionTimers();
+      clearPauseTimers();
+      clearInterfaceTimers();
+
+      if (currentSession) {
+        currentSession.stop().catch(() => {});
+      }
+    });
+
+    window.addEventListener("load", () => {
+      systemEnabled = false;
+      cycleState = "off";
+
+      cycleOverlay.classList.add("hidden");
+      topStatus.classList.add("hidden");
+
+      showScreensaver();
+    });
+  </script>
+</body>
+</html>
